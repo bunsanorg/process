@@ -10,7 +10,7 @@
 #include <boost/serialization/vector.hpp>
 
 #include "bunsan/serialization/path.hpp"
-#include "bunsan/util.hpp"
+#include "bunsan/get.hpp"
 
 namespace bunsan
 {
@@ -76,7 +76,7 @@ namespace bunsan
             }
             inline const boost::filesystem::path &current_path() const
             {
-                return bunsan::get(current_path_, "current_path member was not initialized");
+                return get(current_path_, "current_path member was not initialized");
             }
 
             // executable
@@ -87,7 +87,7 @@ namespace bunsan
             }
             inline const boost::filesystem::path &executable() const
             {
-                return bunsan::get(executable_, "executable member was not initialized");
+                return get(executable_, "executable member was not initialized");
             }
 
             // argv
@@ -113,7 +113,7 @@ namespace bunsan
             }
             inline bool use_path() const
             {
-                return bunsan::get(use_path_, "use_path member was not initialized");
+                return get(use_path_, "use_path member was not initialized");
             }
 
             // build functions

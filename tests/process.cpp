@@ -15,7 +15,7 @@ BOOST_AUTO_TEST_SUITE(context)
 BOOST_AUTO_TEST_CASE(exceptions)
 {
     bunsan::process::context ctx;
-    BOOST_CHECK_THROW(ctx.use_path(), std::invalid_argument);
+    BOOST_CHECK_THROW(ctx.use_path(), bunsan::uninitialized_optional_error);
 }
 
 BOOST_AUTO_TEST_CASE(serialization)

@@ -1,9 +1,9 @@
 #include "bunsan/process/execute.hpp"
 
 #include <boost/process.hpp>
-#include <boost/filesystem.hpp>
+#include <boost/filesystem/path.hpp>
 
-#include "bunsan/util.hpp"
+#include "bunsan/logging/legacy.hpp"
 
 int bunsan::process::sync_execute(bunsan::process::context &&ctx_)
 {
