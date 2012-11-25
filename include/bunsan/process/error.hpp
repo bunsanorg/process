@@ -12,6 +12,8 @@ namespace bunsan{namespace process
 
         /// \see bunsan::error::message
         explicit error(const std::string &message_);
+
+        typedef boost::error_info<struct tag_executable, boost::filesystem::path> executable;
     };
 
     struct non_zero_exit_status_error: virtual error
@@ -27,11 +29,7 @@ namespace bunsan{namespace process
 
     struct nothing_to_execute_error: virtual error {};
 
-    struct invalid_executable_error: virtual error
-    {
-        typedef boost::error_info<struct tag_executable, boost::filesystem::path> executable;
-    };
-
+    struct invalid_executable_error: virtual error {};
     struct empty_executable_error: virtual invalid_executable_error {};
     struct non_basename_executable_error: virtual invalid_executable_error{};
 }}
