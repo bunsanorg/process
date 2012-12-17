@@ -44,18 +44,18 @@ void bunsan::process::context::build_()
         BOOST_THROW_EXCEPTION(nothing_to_execute_error() <<
                               nothing_to_execute_error::message("argv is empty and executable is not set."));
     else if (argv_.empty() && executable_)
-        argv_.push_back(executable_.get().string());
+        argv_.push_back(executable_->string());
     else if (!argv_.empty() && !executable_)
         executable_ = argv_[0];
     if (!current_path_)
         current_path_ = boost::filesystem::current_path();
-    if (!use_path_)// if user haven't set this variable, we have to set it depending executable string
-        use_path_ = executable_.get().filename() == executable_.get();
+    if (!use_path_) // if user haven't set this variable, we have to set it depending executable string
+        use_path_ = executable_->filename() == executable_.get();
     if (use_path_.get())
     {
-        if (executable_.get().empty())
+        if (executable_->empty())
             BOOST_THROW_EXCEPTION(empty_executable_error());
-        if (executable_.get() != executable_.get().filename())
+        if (executable_.get() != executable_->filename())
             BOOST_THROW_EXCEPTION(non_basename_executable_error() <<
                                   non_basename_executable_error::executable(executable_.get()));
     }
