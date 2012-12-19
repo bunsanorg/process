@@ -2,6 +2,7 @@
 
 #include <boost/thread/locks.hpp>
 #include <boost/assert.hpp>
+#include <boost/scope_exit.hpp>
 
 using namespace bunsan::interprocess;
 
@@ -138,12 +139,26 @@ bool file_lock::try_lock()
     return boost::try_lock(m_mutex->mlock, m_mutex->flock);
 }
 
-bool file_lock::timed_lock(const boost::posix_time::ptime &)
+bool file_lock::timed_lock(const boost::posix_time::ptime &abs_time)
 {
     BOOST_ASSERT(*this);
-#warning "is not implemented"
-    BOOST_ASSERT_MSG(false, "is not implemented");
-    return false;
+    bool has_mlock(false), has_flock(false);
+    BOOST_SCOPE_EXIT_ALL(this, has_mlock, has_flock)
+    {
+        if (!has_mlock || !has_flock)
+        {
+            if (has_flock)
+                m_mutex->flock.unlock();
+            if (has_mlock)
+                m_mutex->mlock.unlock();
+        }
+    };
+    has_mlock = m_mutex->mlock.timed_lock(abs_time);
+    if (has_mlock)
+    {
+        has_flock = m_mutex->flock.timed_lock(abs_time);
+    }
+    return has_mlock && has_flock;
 }
 
 void file_lock::unlock()

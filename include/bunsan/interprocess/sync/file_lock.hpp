@@ -113,7 +113,7 @@ namespace bunsan{namespace interprocess
         void swap(file_lock &) noexcept;
         void lock();
         bool try_lock();
-        bool timed_lock(const boost::posix_time::ptime &);
+        bool timed_lock(const boost::posix_time::ptime &abs_time);
         void unlock();
         void lock_sharable();
         bool try_lock_sharable();
