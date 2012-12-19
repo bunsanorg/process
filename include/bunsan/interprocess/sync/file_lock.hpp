@@ -58,7 +58,7 @@ namespace bunsan{namespace interprocess
         static file_lock_factory &instance();
 
     private:
-        bool try_find_mutex(const boost::filesystem::path &path, mutex_ptr &mutex);
+        mutex_ptr try_find_mutex(const boost::filesystem::path &path);
 
         boost::shared_mutex m_lock;
 
@@ -77,6 +77,7 @@ namespace bunsan{namespace interprocess
                         get_path_from_pointer
                     >
                 >,
+                // hashed or ordered?
                 boost::multi_index::ordered_unique
                 <
                     boost::multi_index::tag<struct tag_pointer>,

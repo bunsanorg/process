@@ -5,13 +5,10 @@
 
 using namespace bunsan::interprocess;
 
-namespace
-{
-    file_lock_factory global_file_lock_factory;
-}
-
 file_lock_factory &file_lock_factory::instance()
 {
+    // singleton
+    static file_lock_factory global_file_lock_factory;
     return global_file_lock_factory;
 }
 
@@ -21,46 +18,44 @@ const boost::filesystem::path &file_lock_factory::get_path_from_pointer(const mu
     return mtx->path;
 }
 
-bool file_lock_factory::try_find_mutex(const boost::filesystem::path &path, mutex_ptr &mtx)
+file_lock_factory::mutex_ptr file_lock_factory::try_find_mutex(const boost::filesystem::path &path)
 {
     index_path_type &by_path = m_instances.get<tag_path>();
     index_path_type::iterator it = by_path.find(path);
     if (it != by_path.end())
-    {
-        mtx = *it;
-        return true;
-    }
+        return *it;
     else
-    {
-        return false;
-    }
+        return mutex_ptr();
 }
 
 file_lock file_lock_factory::get(const boost::filesystem::path &path)
 {
-    {
-        boost::shared_lock<boost::shared_mutex> lk(m_lock);
-        mutex_ptr mtx;
-        if (try_find_mutex(path, mtx))
-            return file_lock(*this, mtx);
-    }
-    boost::unique_lock<boost::shared_mutex> lk(m_lock);
     mutex_ptr mtx;
-    if (!try_find_mutex(path, mtx))
     {
-        mtx.reset(new mutex);
-        mtx->path = path;
-        mtx->flock = boost::interprocess::file_lock(path.c_str());
-        m_instances.insert(mtx);
+        const boost::shared_lock<boost::shared_mutex> lk(m_lock);
+        mtx = try_find_mutex(path);
+    }
+    if (!mtx)
+    {
+        const boost::unique_lock<boost::shared_mutex> lk(m_lock);
+        mtx = try_find_mutex(path);
+        if (!mtx)
+        {
+            mtx.reset(new mutex);
+            mtx->path = path;
+            mtx->flock = boost::interprocess::file_lock(path.c_str());
+            m_instances.insert(mtx);
+        }
     }
     return file_lock(*this, mtx);
 }
 
 bool file_lock_factory::try_erase(mutex_ptr &mtx)
 {
+    // try without locking
     if (mtx.use_count() == 2) // mtx and m_instances
     {
-        boost::unique_lock<boost::shared_mutex> lk(m_lock);
+        const boost::unique_lock<boost::shared_mutex> lk(m_lock);
         index_pointer_type &by_pointer = m_instances.get<tag_pointer>();
         index_pointer_type::iterator it = by_pointer.find(mtx);
         if (it != by_pointer.end())
