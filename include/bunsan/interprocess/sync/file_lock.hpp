@@ -56,6 +56,7 @@ namespace bunsan{namespace interprocess
          * Do not use before main()
          */
         static file_lock_factory &instance();
+
     private:
         bool try_find_mutex(const boost::filesystem::path &path, mutex_ptr &mutex);
 

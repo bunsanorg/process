@@ -25,13 +25,15 @@ bool file_lock_factory::try_find_mutex(const boost::filesystem::path &path, mute
 {
     index_path_type &by_path = m_instances.get<tag_path>();
     index_path_type::iterator it = by_path.find(path);
-    if (it!=by_path.end())
+    if (it != by_path.end())
     {
         mtx = *it;
         return true;
     }
     else
+    {
         return false;
+    }
 }
 
 file_lock file_lock_factory::get(const boost::filesystem::path &path)
@@ -56,14 +58,14 @@ file_lock file_lock_factory::get(const boost::filesystem::path &path)
 
 bool file_lock_factory::try_erase(mutex_ptr &mtx)
 {
-    if (mtx.use_count()==2) // mtx and m_instances
+    if (mtx.use_count() == 2) // mtx and m_instances
     {
         boost::unique_lock<boost::shared_mutex> lk(m_lock);
         index_pointer_type &by_pointer = m_instances.get<tag_pointer>();
         index_pointer_type::iterator it = by_pointer.find(mtx);
-        if (it!=by_pointer.end())
+        if (it != by_pointer.end())
         {
-            BOOST_ASSERT(mtx==*it);
+            BOOST_ASSERT(mtx == *it);
             mtx.reset();
             if (it->unique())
             {
@@ -118,7 +120,7 @@ void file_lock::reset() noexcept
 
 file_lock::operator bool() const noexcept
 {
-    BOOST_ASSERT(static_cast<bool>(m_factory)==static_cast<bool>(m_mutex));
+    BOOST_ASSERT(static_cast<bool>(m_factory) == static_cast<bool>(m_mutex));
     return static_cast<bool>(m_factory);
 }
 
