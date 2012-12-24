@@ -2,7 +2,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include "bunsan/interprocess/sync/file_guard.hpp"
-#include "bunsan/system_error.hpp"
+#include "bunsan/filesystem/error.hpp"
 
 #include <boost/filesystem/operations.hpp>
 
@@ -77,7 +77,13 @@ BOOST_AUTO_TEST_CASE(permission_denied)
     const boost::filesystem::path no_perm_file = no_perm_dir / boost::filesystem::unique_path();
     BOOST_REQUIRE(boost::filesystem::exists(no_perm_dir));
     BOOST_REQUIRE(!boost::filesystem::exists(no_perm_file));
-    BOOST_CHECK_THROW(file_guard fg(no_perm_file), bunsan::system_error);
+    const auto check_system_error =
+        [&](const bunsan::filesystem::system_error &e)
+        {
+            const boost::filesystem::path *const path = e.get<bunsan::filesystem::system_error::path>();
+            return path && *path == no_perm_file;
+        };
+    BOOST_CHECK_EXCEPTION(file_guard fg(no_perm_file), bunsan::filesystem::system_error, check_system_error);
 }
 
 BOOST_AUTO_TEST_SUITE_END() // file_guard
