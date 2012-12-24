@@ -15,6 +15,7 @@ bunsan_add_shared_library(${PROJECT_NAME}
     src/process/aliases.cpp
 
     src/interprocess/sync/file_lock.cpp
+    src/interprocess/sync/file_guard.cpp
 )
 
 bunsan_install_headers()
