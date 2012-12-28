@@ -97,7 +97,7 @@ file_lock::file_lock(file_lock &&fl) noexcept:
 
 file_lock &file_lock::operator=(file_lock &&fl) noexcept
 {
-    this->swap(fl);
+    swap(fl);
     fl.reset();
     return *this;
 }
