@@ -33,30 +33,40 @@ namespace bunsan
             context()=default;
             context(const context &)=default;
 
-            inline context(context &&ctx):  current_path_(std::move(ctx.current_path_)),
-                            executable_(std::move(ctx.executable_)),
-                            argv_(std::move(ctx.argv_)),
-                            use_path_(std::move(ctx.use_path_)){}
+            inline context(context &&ctx) noexcept
+            {
+                swap(ctx);
+                ctx.reset();
+            }
 
-            context &operator=(const context &ctx)
+            inline context &operator=(const context &ctx)
             {
                 context ctx_(ctx);
-                this->swap(ctx_);
+                swap(ctx_);
                 return *this;
             }
 
             inline context &operator=(context &&ctx) noexcept
             {
-                this->swap(ctx);
+                swap(ctx);
+                ctx.reset();
                 return *this;
             }
 
             inline bool operator==(const context &ctx) const
             {
-                return  current_path_==ctx.current_path_ &&
-                        executable_==ctx.executable_ &&
-                        argv_==ctx.argv_ &&
-                        use_path_==ctx.use_path_;
+                return current_path_==ctx.current_path_ &&
+                       executable_==ctx.executable_ &&
+                       argv_==ctx.argv_ &&
+                       use_path_==ctx.use_path_;
+            }
+
+            void reset() noexcept
+            {
+                current_path_.reset();
+                executable_.reset();
+                argv_.clear();
+                use_path_.reset();
             }
 
             inline void swap(context &ctx) noexcept
@@ -126,7 +136,7 @@ namespace bunsan
             {
                 context ctx(*this);
                 ctx.build_();
-                this->swap(ctx);
+                swap(ctx);
             }
 
             inline context built() const
