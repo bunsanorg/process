@@ -5,29 +5,34 @@
 
 #include <boost/optional.hpp>
 #include <boost/filesystem/path.hpp>
+#include <boost/operators.hpp>
 #include <boost/serialization/access.hpp>
+#include <boost/serialization/nvp.hpp>
+
 #include <boost/serialization/optional.hpp>
 #include <boost/serialization/vector.hpp>
-
 #include "bunsan/serialization/path.hpp"
+
 #include "bunsan/get.hpp"
 
 namespace bunsan
 {
     namespace process
     {
-        class context
+        class context: public boost::equality_comparable<context>
         {
-        friend class boost::serialization::access;
+            friend class boost::serialization::access;
 
-        template <typename Archive>
-        void serialize(Archive &ar, const unsigned int /*version*/)
-        {
-            ar & current_path_;
-            ar & executable_;
-            ar & argv_;
-            ar & use_path_;
-        }
+#define BUNSAN_PROCESS_CONTEXT_NVP(X) boost::serialization::make_nvp(#X, m_##X)
+            template <typename Archive>
+            void serialize(Archive &ar, const unsigned int /*version*/)
+            {
+                ar & BUNSAN_PROCESS_CONTEXT_NVP(current_path);
+                ar & BUNSAN_PROCESS_CONTEXT_NVP(executable);
+                ar & BUNSAN_PROCESS_CONTEXT_NVP(argv);
+                ar & BUNSAN_PROCESS_CONTEXT_NVP(use_path);
+            }
+#undef BUNSAN_PROCESS_CONTEXT_NVP
 
         public:
             context()=default;
@@ -55,75 +60,75 @@ namespace bunsan
 
             inline bool operator==(const context &ctx) const
             {
-                return current_path_==ctx.current_path_ &&
-                       executable_==ctx.executable_ &&
-                       argv_==ctx.argv_ &&
-                       use_path_==ctx.use_path_;
+                return m_current_path == ctx.m_current_path &&
+                       m_executable == ctx.m_executable &&
+                       m_argv == ctx.m_argv &&
+                       m_use_path == ctx.m_use_path;
             }
 
             void reset() noexcept
             {
-                current_path_.reset();
-                executable_.reset();
-                argv_.clear();
-                use_path_.reset();
+                m_current_path.reset();
+                m_executable.reset();
+                m_argv.clear();
+                m_use_path.reset();
             }
 
             inline void swap(context &ctx) noexcept
             {
                 using boost::swap;
-                swap(current_path_, ctx.current_path_);
-                swap(executable_, ctx.executable_);
-                swap(argv_, ctx.argv_);
-                swap(use_path_, ctx.use_path_);
+                swap(m_current_path, ctx.m_current_path);
+                swap(m_executable, ctx.m_executable);
+                swap(m_argv, ctx.m_argv);
+                swap(m_use_path, ctx.m_use_path);
             }
 
             // current path
             inline context &current_path(const boost::filesystem::path &current_path_)
             {
-                this->current_path_ = current_path_;
+                m_current_path = current_path_;
                 return *this;
             }
             inline const boost::filesystem::path &current_path() const
             {
-                return get(current_path_, "current_path member was not initialized");
+                return get(m_current_path, "current_path member was not initialized");
             }
 
             // executable
             inline context &executable(const boost::filesystem::path &executable_)
             {
-                this->executable_ = executable_;
+                m_executable = executable_;
                 return *this;
             }
             inline const boost::filesystem::path &executable() const
             {
-                return get(executable_, "executable member was not initialized");
+                return get(m_executable, "executable member was not initialized");
             }
 
             // argv
             inline context &argv(const std::vector<std::string> &argv_)
             {
-                this->argv_ = argv_;
+                m_argv = argv_;
                 return *this;
             }
             inline const std::vector<std::string> &argv() const
             {
-                return argv_;
+                return m_argv;
             }
             inline std::vector<std::string> &argv()
             {
-                return argv_;
+                return m_argv;
             }
 
             // use path
             inline context &use_path(bool use_path_)
             {
-                this->use_path_ = use_path_;
+                m_use_path = use_path_;
                 return *this;
             }
             inline bool use_path() const
             {
-                return get(use_path_, "use_path member was not initialized");
+                return get(m_use_path, "use_path member was not initialized");
             }
 
             // build functions
@@ -149,10 +154,10 @@ namespace bunsan
         private:
             void build_();
 
-            boost::optional<boost::filesystem::path> current_path_;
-            boost::optional<boost::filesystem::path> executable_;
-            std::vector<std::string> argv_;
-            boost::optional<bool> use_path_;
+            boost::optional<boost::filesystem::path> m_current_path;
+            boost::optional<boost::filesystem::path> m_executable;
+            std::vector<std::string> m_argv;
+            boost::optional<bool> m_use_path;
         };
         inline void swap(context &a, context &b) noexcept
         {
