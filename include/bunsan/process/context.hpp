@@ -29,7 +29,7 @@ namespace bunsan
             {
                 ar & BUNSAN_PROCESS_CONTEXT_NVP(current_path);
                 ar & BUNSAN_PROCESS_CONTEXT_NVP(executable);
-                ar & BUNSAN_PROCESS_CONTEXT_NVP(argv);
+                ar & BUNSAN_PROCESS_CONTEXT_NVP(arguments);
                 ar & BUNSAN_PROCESS_CONTEXT_NVP(use_path);
             }
 #undef BUNSAN_PROCESS_CONTEXT_NVP
@@ -62,7 +62,7 @@ namespace bunsan
             {
                 return m_current_path == ctx.m_current_path &&
                        m_executable == ctx.m_executable &&
-                       m_argv == ctx.m_argv &&
+                       m_arguments == ctx.m_arguments &&
                        m_use_path == ctx.m_use_path;
             }
 
@@ -70,7 +70,7 @@ namespace bunsan
             {
                 m_current_path.reset();
                 m_executable.reset();
-                m_argv.clear();
+                m_arguments.clear();
                 m_use_path.reset();
             }
 
@@ -79,7 +79,7 @@ namespace bunsan
                 using boost::swap;
                 swap(m_current_path, ctx.m_current_path);
                 swap(m_executable, ctx.m_executable);
-                swap(m_argv, ctx.m_argv);
+                swap(m_arguments, ctx.m_arguments);
                 swap(m_use_path, ctx.m_use_path);
             }
 
@@ -105,19 +105,19 @@ namespace bunsan
                 return get(m_executable, "executable member was not initialized");
             }
 
-            // argv
-            inline context &argv(const std::vector<std::string> &argv_)
+            // arguments
+            inline context &arguments(const std::vector<std::string> &arguments_)
             {
-                m_argv = argv_;
+                m_arguments = arguments_;
                 return *this;
             }
-            inline const std::vector<std::string> &argv() const
+            inline const std::vector<std::string> &arguments() const
             {
-                return m_argv;
+                return m_arguments;
             }
-            inline std::vector<std::string> &argv()
+            inline std::vector<std::string> &arguments()
             {
-                return m_argv;
+                return m_arguments;
             }
 
             // use path
@@ -156,7 +156,7 @@ namespace bunsan
 
             boost::optional<boost::filesystem::path> m_current_path;
             boost::optional<boost::filesystem::path> m_executable;
-            std::vector<std::string> m_argv;
+            std::vector<std::string> m_arguments;
             boost::optional<bool> m_use_path;
         };
         inline void swap(context &a, context &b) noexcept

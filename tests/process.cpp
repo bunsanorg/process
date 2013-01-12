@@ -22,7 +22,7 @@ BOOST_AUTO_TEST_CASE(serialization)
 {
     bunsan::process::context ctx;
     ctx.executable("sdnakdn");
-    ctx.argv({"hello", "world"});
+    ctx.arguments({"hello", "world"});
 
     std::stringstream buf;
     {

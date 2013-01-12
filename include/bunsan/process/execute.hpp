@@ -21,18 +21,18 @@ namespace bunsan
         inline int sync_execute(
             const boost::filesystem::path &cwd,
             const boost::filesystem::path &executable,
-            const std::vector<std::string> &args,
+            const std::vector<std::string> &arguments,
             bool use_path=true)
         {
-            return sync_execute(context().current_path(cwd).executable(executable).argv(args).use_path(use_path));
+            return sync_execute(context().current_path(cwd).executable(executable).arguments(arguments).use_path(use_path));
         }
 
         inline int sync_execute(
             const boost::filesystem::path &cwd,
-            const std::vector<std::string> &args,
+            const std::vector<std::string> &arguments,
             bool use_path=true)
         {
-            return sync_execute(context().current_path(cwd).argv(args).use_path(use_path));
+            return sync_execute(context().current_path(cwd).arguments(arguments).use_path(use_path));
         }
 
         template <typename ... Args>

@@ -23,10 +23,10 @@ int bunsan::process::sync_execute(bunsan::process::context &&ctx_)
         else
             exec_ = ctx_.executable().string();
         SLOG("executing \"" << exec_ << "\" in " << ctx_.current_path() << " with args");
-        for (std::size_t i = 0; i < ctx_.argv().size(); ++i)
-            SLOG("args[" << i << "] == \"" << ctx_.argv()[i] << "\"");
+        for (std::size_t i = 0; i < ctx_.arguments().size(); ++i)
+            SLOG("args[" << i << "] == \"" << ctx_.arguments()[i] << "\"");
         // waiting
-        boost::process::child child = boost::process::launch(exec_, ctx_.argv(), ctx);
+        boost::process::child child = boost::process::launch(exec_, ctx_.arguments(), ctx);
         DLOG(waiting for a child process);
         boost::process::status status = child.wait();
         DLOG(child process has completed);
@@ -40,13 +40,13 @@ int bunsan::process::sync_execute(bunsan::process::context &&ctx_)
 
 void bunsan::process::context::build_()
 {
-    if (m_argv.empty() && !m_executable)
+    if (m_arguments.empty() && !m_executable)
         BOOST_THROW_EXCEPTION(nothing_to_execute_error() <<
-                              nothing_to_execute_error::message("argv is empty and executable is not set."));
-    else if (m_argv.empty() && m_executable)
-        m_argv.push_back(m_executable->string());
-    else if (!m_argv.empty() && !m_executable)
-        m_executable = m_argv[0];
+                              nothing_to_execute_error::message("arguments is empty and executable is not set."));
+    else if (m_arguments.empty() && m_executable)
+        m_arguments.push_back(m_executable->string());
+    else if (!m_arguments.empty() && !m_executable)
+        m_executable = m_arguments[0];
     if (!m_current_path)
         m_current_path = boost::filesystem::current_path();
     if (!m_use_path) // if user haven't set this variable, we have to set it depending executable string
