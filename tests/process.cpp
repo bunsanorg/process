@@ -22,7 +22,7 @@ BOOST_AUTO_TEST_CASE(serialization)
 {
     bunsan::process::context ctx;
     ctx.executable("sdnakdn");
-    ctx.arguments({"hello", "world"});
+    ctx.arguments("hello", "world");
 
     std::stringstream buf;
     {
@@ -34,6 +34,75 @@ BOOST_AUTO_TEST_CASE(serialization)
         boost::archive::text_iarchive ia(buf);
         ia >> ctx_;
         BOOST_CHECK(ctx == ctx_);
+    }
+}
+
+BOOST_AUTO_TEST_CASE(arguments)
+{
+    bunsan::process::context ctx;
+
+    ctx.arguments("0");
+    BOOST_CHECK_EQUAL(ctx.arguments()[0], "0");
+
+    ctx.arguments("0", "1", "2");
+    BOOST_CHECK_EQUAL(ctx.arguments()[0], "0");
+    BOOST_CHECK_EQUAL(ctx.arguments()[1], "1");
+    BOOST_CHECK_EQUAL(ctx.arguments()[2], "2");
+
+    {
+        std::vector<std::string> v = {"0", "1", "2"};
+
+        ctx.arguments(v);
+        BOOST_CHECK_EQUAL(ctx.arguments()[0], "0");
+        BOOST_CHECK_EQUAL(ctx.arguments()[1], "1");
+        BOOST_CHECK_EQUAL(ctx.arguments()[2], "2");
+
+        ctx.arguments(std::move(v));
+        BOOST_CHECK(v.empty());
+        BOOST_CHECK_EQUAL(ctx.arguments()[0], "0");
+        BOOST_CHECK_EQUAL(ctx.arguments()[1], "1");
+        BOOST_CHECK_EQUAL(ctx.arguments()[2], "2");
+    }
+
+    {
+        typedef std::vector<std::string> vs;
+        typedef boost::optional<std::string> os;
+        typedef std::vector<os> vos;
+        const vs _23 = {"second", "third"};
+        const vos _56 = {os("fifth"), os(), os("sixth"), os()};
+        const vs result = {"first", "second", "third", "fourth", "fifth", "sixth"};
+        ctx.arguments("first", _23, os("fourth"), os(), _56);
+        BOOST_CHECK(ctx.arguments() == result);
+    }
+}
+
+BOOST_AUTO_TEST_CASE(arguments_append)
+{
+    bunsan::process::context ctx;
+
+    ctx.arguments("0");
+    BOOST_CHECK_EQUAL(ctx.arguments()[0], "0");
+
+    ctx.arguments_append("1");
+    BOOST_CHECK_EQUAL(ctx.arguments()[0], "0");
+    BOOST_CHECK_EQUAL(ctx.arguments()[1], "1");
+
+    ctx.arguments_append("2", "3");
+    BOOST_CHECK_EQUAL(ctx.arguments()[0], "0");
+    BOOST_CHECK_EQUAL(ctx.arguments()[1], "1");
+    BOOST_CHECK_EQUAL(ctx.arguments()[2], "2");
+    BOOST_CHECK_EQUAL(ctx.arguments()[3], "3");
+
+    ctx.arguments("0");
+    BOOST_CHECK_EQUAL(ctx.arguments()[0], "0");
+
+    {
+        std::vector<std::string> v = {"1", "2", "3"};
+        ctx.arguments_append(v);
+        BOOST_CHECK_EQUAL(ctx.arguments()[0], "0");
+        BOOST_CHECK_EQUAL(ctx.arguments()[1], "1");
+        BOOST_CHECK_EQUAL(ctx.arguments()[2], "2");
+        BOOST_CHECK_EQUAL(ctx.arguments()[3], "3");
     }
 }
 
