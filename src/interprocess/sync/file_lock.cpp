@@ -44,7 +44,7 @@ file_lock file_lock_factory::get(const boost::filesystem::path &path)
         {
             mtx.reset(new mutex);
             mtx->path = path;
-            mtx->flock = boost::interprocess::file_lock(path.c_str());
+            mtx->flock = boost::interprocess::file_lock(path.string().c_str());
             m_instances.insert(mtx);
         }
     }
