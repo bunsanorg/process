@@ -10,7 +10,7 @@ namespace bunsan{namespace interprocess
 {
     file_guard::file_guard(const boost::filesystem::path &path): m_path(path)
     {
-        FILE *file = std::fopen(path.c_str(), "wx");
+        FILE *file = std::fopen(path.string().c_str(), "wx");
         if (file)
         {
             BOOST_VERIFY(fclose(file) == 0);
