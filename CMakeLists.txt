@@ -7,7 +7,7 @@ cmake_minimum_required(VERSION 2.8)
 include(BunsanCommon)
 
 bunsan_use_bunsan(common)
-bunsan_use_boost(system filesystem serialization unit_test_framework thread)
+bunsan_use_boost(system filesystem serialization thread)
 
 bunsan_add_shared_library(${PROJECT_NAME}
     src/process/error.cpp
