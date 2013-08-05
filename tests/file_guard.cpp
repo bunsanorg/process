@@ -3,6 +3,7 @@
 
 #include <bunsan/filesystem/error.hpp>
 #include <bunsan/interprocess/sync/file_guard.hpp>
+#include <bunsan/testing/filesystem/tempdir.hpp>
 
 #include <boost/filesystem/operations.hpp>
 
@@ -64,16 +65,18 @@ BOOST_AUTO_TEST_CASE(directory_lock)
 
 BOOST_AUTO_TEST_CASE(permission_denied)
 {
-    // existing path with no permissions
-#if 0
     // create directory with no write permissions
-    const boost::filesystem::path no_perm_dir = boost::filesystem::temp_directory_path() / boost::filesystem::unique_path();
-    BOOST_REQUIRE(boost::filesystem::create_directory(no_perm_dir));
-#else
-    // FIXME only works from non-root user on UNIX
-    const boost::filesystem::path no_perm_dir = "/";
-#endif
-    // TODO check that unable to write
+    const bunsan::testing::filesystem::tempdir tmpdir;
+    const boost::filesystem::perms all_read =
+        boost::filesystem::owner_read |
+        boost::filesystem::group_read |
+        boost::filesystem::others_read;
+    const boost::filesystem::perms all_exe =
+        boost::filesystem::owner_exe |
+        boost::filesystem::group_exe |
+        boost::filesystem::others_exe;
+    boost::filesystem::permissions(tmpdir.path, all_read | all_exe);
+    const boost::filesystem::path &no_perm_dir = tmpdir.path;
     const boost::filesystem::path no_perm_file = no_perm_dir / boost::filesystem::unique_path();
     BOOST_REQUIRE(boost::filesystem::exists(no_perm_dir));
     BOOST_REQUIRE(!boost::filesystem::exists(no_perm_file));
