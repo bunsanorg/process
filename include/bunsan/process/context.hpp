@@ -1,19 +1,19 @@
 #pragma once
 
-#include <string>
-#include <vector>
+#include <bunsan/get.hpp>
 
-#include <boost/optional.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/operators.hpp>
+#include <boost/optional.hpp>
 #include <boost/serialization/access.hpp>
 #include <boost/serialization/nvp.hpp>
 
 #include <boost/serialization/optional.hpp>
-#include <boost/serialization/vector.hpp>
 #include <bunsan/serialization/path.hpp>
+#include <boost/serialization/vector.hpp>
 
-#include <bunsan/get.hpp>
+#include <string>
+#include <vector>
 
 namespace bunsan{namespace process
 {

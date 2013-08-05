@@ -1,10 +1,11 @@
 #include <bunsan/interprocess/sync/file_guard.hpp>
+
 #include <bunsan/filesystem/error.hpp>
 
-#include <cstdio>
-
-#include <boost/filesystem/operations.hpp>
 #include <boost/assert.hpp>
+#include <boost/filesystem/operations.hpp>
+
+#include <cstdio>
 
 namespace bunsan{namespace interprocess
 {

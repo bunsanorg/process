@@ -1,8 +1,8 @@
 #pragma once
 
-#include <memory>
-#include <atomic>
-
+#include <boost/date_time/posix_time/ptime.hpp>
+#include <boost/filesystem/path.hpp>
+#include <boost/interprocess/sync/file_lock.hpp>
 #include <boost/multi_index_container.hpp>
 #include <boost/multi_index/hashed_index.hpp>
 #include <boost/multi_index/ordered_index.hpp>
@@ -10,9 +10,9 @@
 #include <boost/multi_index/identity.hpp>
 #include <boost/optional.hpp>
 #include <boost/thread/shared_mutex.hpp>
-#include <boost/date_time/posix_time/ptime.hpp>
-#include <boost/interprocess/sync/file_lock.hpp>
-#include <boost/filesystem/path.hpp>
+
+#include <atomic>
+#include <memory>
 
 namespace bunsan{namespace interprocess
 {

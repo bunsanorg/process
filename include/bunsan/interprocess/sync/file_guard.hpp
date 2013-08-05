@@ -2,8 +2,8 @@
 
 #include <bunsan/error.hpp>
 
-#include <boost/optional.hpp>
 #include <boost/filesystem/path.hpp>
+#include <boost/optional.hpp>
 
 namespace bunsan{namespace interprocess
 {

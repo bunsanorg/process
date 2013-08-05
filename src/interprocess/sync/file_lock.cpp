@@ -1,8 +1,8 @@
 #include <bunsan/interprocess/sync/file_lock.hpp>
 
-#include <boost/thread/locks.hpp>
 #include <boost/assert.hpp>
 #include <boost/scope_exit.hpp>
+#include <boost/thread/locks.hpp>
 
 using namespace bunsan::interprocess;
 
