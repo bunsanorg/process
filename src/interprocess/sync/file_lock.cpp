@@ -1,4 +1,4 @@
-#include "bunsan/interprocess/sync/file_lock.hpp"
+#include <bunsan/interprocess/sync/file_lock.hpp>
 
 #include <boost/thread/locks.hpp>
 #include <boost/assert.hpp>

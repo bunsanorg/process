@@ -1,7 +1,7 @@
 #define BOOST_TEST_MODULE process
 #include <boost/test/unit_test.hpp>
 
-#include "bunsan/process/context.hpp"
+#include <bunsan/process/context.hpp>
 
 #include <boost/archive/text_iarchive.hpp>
 #include <boost/archive/text_oarchive.hpp>

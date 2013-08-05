@@ -1,6 +1,6 @@
 #pragma once
 
-#include "bunsan/error.hpp"
+#include <bunsan/error.hpp>
 
 #include <boost/optional.hpp>
 #include <boost/filesystem/path.hpp>

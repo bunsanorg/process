@@ -1,8 +1,8 @@
 #define BOOST_TEST_MODULE file_guard
 #include <boost/test/unit_test.hpp>
 
-#include "bunsan/interprocess/sync/file_guard.hpp"
-#include "bunsan/filesystem/error.hpp"
+#include <bunsan/interprocess/sync/file_guard.hpp>
+#include <bunsan/filesystem/error.hpp>
 
 #include <boost/filesystem/operations.hpp>
 
