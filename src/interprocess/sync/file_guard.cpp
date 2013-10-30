@@ -11,20 +11,32 @@ namespace bunsan{namespace interprocess
 {
     file_guard::file_guard(const boost::filesystem::path &path): m_path(path)
     {
-        FILE *file = std::fopen(path.string().c_str(), "wx");
-        if (file)
+        try
         {
-            BOOST_VERIFY(fclose(file) == 0);
+            FILE *const file = std::fopen(path.string().c_str(), "wx");
+            if (file)
+            {
+                BOOST_VERIFY(fclose(file) == 0);
+            }
+            else if (errno == EEXIST)
+            {
+                BOOST_THROW_EXCEPTION(file_guard_locked_error() <<
+                                      file_guard_locked_error::lock_path(path));
+            }
+            else
+            {
+                BOOST_THROW_EXCEPTION(filesystem::system_error("open") <<
+                                      filesystem::system_error::path(path));
+            }
         }
-        else if (errno == EEXIST)
+        catch (file_guard_locked_error &)
         {
-            BOOST_THROW_EXCEPTION(file_guard_locked_error() <<
-                                  file_guard_locked_error::lock_path(path));
+            throw;
         }
-        else
+        catch (std::exception &)
         {
-            BOOST_THROW_EXCEPTION(filesystem::system_error("open") <<
-                                  filesystem::system_error::path(path));
+            BOOST_THROW_EXCEPTION(file_guard_create_error() <<
+                                  enable_nested_current());
         }
     }
 
@@ -54,9 +66,17 @@ namespace bunsan{namespace interprocess
 
     void file_guard::remove()
     {
-        if (m_path)
-            BOOST_VERIFY(boost::filesystem::remove(m_path.get()));
-        m_path.reset();
+        try
+        {
+            if (m_path)
+                BOOST_VERIFY(boost::filesystem::remove(m_path.get()));
+            m_path.reset();
+        }
+        catch (std::exception &)
+        {
+            BOOST_THROW_EXCEPTION(file_guard_remove_error() <<
+                                  enable_nested_current());
+        }
     }
 
     file_guard::~file_guard()

@@ -12,7 +12,9 @@ namespace bunsan{namespace interprocess
         typedef boost::error_info<struct tag_lock_path, boost::filesystem::path> lock_path;
     };
 
-    struct file_guard_locked_error: virtual file_guard_error {};
+    struct file_guard_create_error: virtual file_guard_error {};
+    struct file_guard_locked_error: virtual file_guard_create_error {};
+    struct file_guard_remove_error: virtual file_guard_error {};
 
     class file_guard
     {

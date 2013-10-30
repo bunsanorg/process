@@ -86,7 +86,23 @@ BOOST_AUTO_TEST_CASE(permission_denied)
             const boost::filesystem::path *const path = e.get<bunsan::filesystem::system_error::path>();
             return path && *path == no_perm_file;
         };
-    BOOST_CHECK_EXCEPTION(file_guard fg(no_perm_file), bunsan::filesystem::system_error, check_system_error);
+    const auto check_create_error =
+        [&](const bunsan::interprocess::file_guard_create_error &e)
+        {
+            if (e.get<bunsan::error::nested_exception>())
+            {
+                BOOST_CHECK_EXCEPTION(
+                    boost::rethrow_exception(*e.get<bunsan::error::nested_exception>()),
+                    bunsan::filesystem::system_error,
+                    check_system_error);
+                return true;
+            }
+            return false;
+        };
+    BOOST_CHECK_EXCEPTION(
+        file_guard fg(no_perm_file),
+        bunsan::interprocess::file_guard_create_error,
+        check_create_error);
 }
 
 BOOST_AUTO_TEST_SUITE_END() // file_guard
