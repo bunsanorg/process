@@ -1,17 +1,19 @@
 #include <bunsan/process/execute.hpp>
 
-#include <bunsan/enable_error_info.hpp>
 #include <bunsan/logging/legacy.hpp>
 
 #include <boost/assert.hpp>
 #include <boost/filesystem/path.hpp>
+#include <boost/io/detail/quoted_manip.hpp> // for logging
 #include <boost/process.hpp>
+
+#include <sstream> // for logging
 
 int bunsan::process::sync_execute(bunsan::process::context &&ctx_)
 {
     ctx_.build();
     SLOG("trying to execute " << ctx_.executable() << " in " << ctx_.current_path() << (ctx_.use_path() ? " ":" without") << " using path");
-    BUNSAN_EXCEPTIONS_WRAP_BEGIN()
+    try
     {
         boost::process::context ctx;
         ctx.work_directory = ctx_.current_path().string();
@@ -23,9 +25,18 @@ int bunsan::process::sync_execute(bunsan::process::context &&ctx_)
             exec_ = boost::process::find_executable_in_path(ctx_.executable().string());
         else
             exec_ = ctx_.executable().string();
-        SLOG("executing \"" << exec_ << "\" in " << ctx_.current_path() << " with args");
-        for (std::size_t i = 0; i < ctx_.arguments().size(); ++i)
-            SLOG("args[" << i << "] == \"" << ctx_.arguments()[i] << "\"");
+        { // begin logging section
+            std::ostringstream sout;
+            sout << "executing \"" << exec_ << "\" in " << ctx_.current_path() << " with args = [";
+            for (std::size_t i = 0; i < ctx_.arguments().size(); ++i)
+            {
+                if (i)
+                    sout << ", ";
+                sout << boost::io::quoted(ctx_.arguments()[i]);
+            }
+            sout << ']';
+            SLOG(sout.str());
+        } // end logging section
         // waiting
         boost::process::child child = boost::process::launch(exec_, ctx_.arguments(), ctx);
         DLOG(waiting for a child process);
@@ -36,7 +47,12 @@ int bunsan::process::sync_execute(bunsan::process::context &&ctx_)
         else
             return -1;
     }
-    BUNSAN_EXCEPTIONS_WRAP_END_ERROR_INFO(error::executable(ctx_.executable()))
+    catch (std::exception &)
+    {
+        BOOST_THROW_EXCEPTION(sync_execute_error() <<
+                              sync_execute_error::executable(ctx_.executable()) <<
+                              enable_nested_current());
+    }
 }
 
 void bunsan::process::context::build_()
