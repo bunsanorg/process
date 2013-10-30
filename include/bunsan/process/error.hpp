@@ -31,5 +31,5 @@ namespace bunsan{namespace process
 
     struct invalid_executable_error: virtual error {};
     struct empty_executable_error: virtual invalid_executable_error {};
-    struct non_basename_executable_error: virtual invalid_executable_error{};
+    struct non_basename_executable_error: virtual invalid_executable_error {};
 }}
