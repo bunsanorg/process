@@ -41,29 +41,36 @@ int bunsan::process::sync_execute(bunsan::process::context &&ctx_)
 
 void bunsan::process::context::build_()
 {
-    if (m_arguments.empty() && !m_executable)
-        BOOST_THROW_EXCEPTION(nothing_to_execute_error() <<
-                              nothing_to_execute_error::message("arguments is empty and executable is not set."));
-    else if (m_arguments.empty() && m_executable)
-        m_arguments.push_back(m_executable->string());
-    else if (!m_arguments.empty() && !m_executable)
-        m_executable = m_arguments[0];
-    if (!m_current_path)
-        m_current_path = boost::filesystem::current_path();
-    if (!m_use_path) // if user haven't set this variable, we have to set it depending executable string
-        m_use_path = m_executable->filename() == m_executable.get();
-    if (m_use_path.get())
+    try
     {
-        if (m_executable->empty())
-            BOOST_THROW_EXCEPTION(empty_executable_error());
-        if (m_executable.get() != m_executable->filename())
-            BOOST_THROW_EXCEPTION(non_basename_executable_error() <<
-                                  non_basename_executable_error::executable(m_executable.get()));
+        if (m_arguments.empty() && !m_executable)
+            BOOST_THROW_EXCEPTION(nothing_to_execute_error() <<
+                                  nothing_to_execute_error::message("arguments is empty and executable is not set."));
+        else if (m_arguments.empty() && m_executable)
+            m_arguments.push_back(m_executable->string());
+        else if (!m_arguments.empty() && !m_executable)
+            m_executable = m_arguments[0];
+        if (!m_current_path)
+            m_current_path = boost::filesystem::current_path();
+        if (!m_use_path) // if user haven't set this variable, we have to set it depending executable string
+            m_use_path = m_executable->filename() == m_executable.get();
+        if (m_use_path.get())
+        {
+            if (m_executable->empty())
+                BOOST_THROW_EXCEPTION(empty_executable_error());
+            if (m_executable.get() != m_executable->filename())
+                BOOST_THROW_EXCEPTION(non_basename_executable_error() <<
+                                      non_basename_executable_error::executable(m_executable.get()));
+        }
+        else
+        {
+            // TODO if we do not use path, is it prefered to have absolute path to the executable file
+            // or should we raise an exception?
+            m_executable = boost::filesystem::absolute(m_executable.get());
+        }
     }
-    else
+    catch (std::exception &)
     {
-        // TODO if we do not use path, is it prefered to have absolute path to the executable file
-        // or should we raise an exception?
-        m_executable = boost::filesystem::absolute(m_executable.get());
+        BOOST_THROW_EXCEPTION(context_build_error() << enable_nested_current());
     }
 }
