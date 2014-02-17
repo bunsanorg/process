@@ -37,4 +37,10 @@ namespace bunsan{namespace process
 
     struct context_error: virtual error {};
     struct context_build_error: virtual context_error {};
+
+    struct find_executable_in_path_error: virtual error {};
+    struct environment_path_error: virtual find_executable_in_path_error {};
+    struct no_environment_path_error: virtual environment_path_error {};
+    struct empty_environment_path_error: virtual environment_path_error {};
+    struct no_executable_in_path_error: virtual find_executable_in_path_error {};
 }}

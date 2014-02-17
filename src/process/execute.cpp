@@ -2,7 +2,7 @@
 
 #include <bunsan/process/detail/context.hpp>
 #include <bunsan/process/detail/execute.hpp>
-#include <bunsan/process/detail/path.hpp>
+#include <bunsan/process/path.hpp>
 
 #include <bunsan/logging/legacy.hpp>
 
@@ -23,7 +23,7 @@ int bunsan::process::sync_execute(bunsan::process::context &&ctx)
     detail::context ctx_;
 
     if (ctx.use_path())
-        ctx_.executable = detail::find_executable_in_path(ctx.executable());
+        ctx_.executable = find_executable_in_path(ctx.executable());
     else
         ctx_.executable = ctx.executable();
 
