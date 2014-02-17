@@ -13,6 +13,7 @@ if(UNIX)
     set(platform_sources
         src/process/detail/unix/path.cpp
         src/process/detail/unix/execute.cpp
+        src/process/detail/unix/executor.cpp
     )
 else()
     message(SEND_ERROR "Platform is not supported")
