@@ -1,61 +1,50 @@
 #include <bunsan/process/execute.hpp>
 
+#include <bunsan/process/detail/context.hpp>
+#include <bunsan/process/detail/execute.hpp>
+#include <bunsan/process/detail/path.hpp>
+
 #include <bunsan/logging/legacy.hpp>
 
 #include <boost/assert.hpp>
 #include <boost/filesystem/path.hpp>
+#include <boost/filesystem/operations.hpp>
 #include <boost/io/detail/quoted_manip.hpp> // for logging
-#include <boost/process.hpp>
 
 #include <sstream> // for logging
 
-int bunsan::process::sync_execute(bunsan::process::context &&ctx_)
+int bunsan::process::sync_execute(bunsan::process::context &&ctx)
 {
-    ctx_.build();
-    SLOG("trying to execute " << ctx_.executable() <<
-         " in " << ctx_.current_path() <<
-         (ctx_.use_path() ? " ":" without") << " using path");
-    try
-    {
-        boost::process::context ctx;
-        ctx.work_directory = ctx_.current_path().string();
-        ctx.environment = boost::process::self::get_environment();
-        ctx.stdout_behavior = boost::process::inherit_stream();
-        ctx.stderr_behavior = boost::process::inherit_stream();
-        std::string exec_;
-        if (ctx_.use_path())
-            exec_ = boost::process::find_executable_in_path(ctx_.executable().string());
-        else
-            exec_ = ctx_.executable().string();
-        { // begin logging section
-            std::ostringstream sout;
-            sout << "executing \"" << exec_ << "\" in " <<
-                    ctx_.current_path() << " with args = [";
-            for (std::size_t i = 0; i < ctx_.arguments().size(); ++i)
-            {
-                if (i)
-                    sout << ", ";
-                sout << boost::io::quoted(ctx_.arguments()[i]);
-            }
-            sout << ']';
-            SLOG(sout.str());
-        } // end logging section
-        // waiting
-        boost::process::child child = boost::process::launch(exec_, ctx_.arguments(), ctx);
-        DLOG(waiting for a child process);
-        boost::process::status status = child.wait();
-        DLOG(child process has completed);
-        if (status.exited())
-            return status.exit_status();
-        else
-            return -1;
-    }
-    catch (std::exception &)
-    {
-        BOOST_THROW_EXCEPTION(sync_execute_error() <<
-                              sync_execute_error::executable(ctx_.executable()) <<
-                              enable_nested_current());
-    }
+    ctx.build();
+    SLOG("attempt to execute " << ctx.executable() <<
+         " in " << ctx.current_path() <<
+         (ctx.use_path() ? " ":" without") << " using path");
+
+    detail::context ctx_;
+
+    if (ctx.use_path())
+        ctx_.executable = detail::find_executable_in_path(ctx.executable());
+    else
+        ctx_.executable = ctx.executable();
+
+    ctx_.current_path = ctx.current_path();
+    ctx_.arguments = ctx.arguments();
+
+    { // begin logging section
+        std::ostringstream sout;
+        sout << "executing " << ctx_.executable << " in " <<
+                ctx_.current_path << " with arguments = [";
+        for (std::size_t i = 0; i < ctx_.arguments.size(); ++i)
+        {
+            if (i)
+                sout << ", ";
+            sout << boost::io::quoted(ctx_.arguments[i]);
+        }
+        sout << ']';
+        SLOG(sout.str());
+    } // end logging section
+
+    return detail::sync_execute(ctx_);
 }
 
 void bunsan::process::context::build_()
@@ -66,7 +55,7 @@ void bunsan::process::context::build_()
             BOOST_THROW_EXCEPTION(
                 nothing_to_execute_error() <<
                 nothing_to_execute_error::message(
-                    "arguments is empty and executable is not set."));
+                    "arguments are empty and executable is not set"));
         else if (m_arguments.empty() && m_executable)
             m_arguments.push_back(m_executable->string());
         else if (!m_arguments.empty() && !m_executable)

@@ -9,10 +9,21 @@ include(BunsanCommon)
 bunsan_use_bunsan(common)
 bunsan_use_boost(system filesystem serialization thread)
 
+if(UNIX)
+    set(platform_sources
+        src/process/detail/unix/path.cpp
+        src/process/detail/unix/execute.cpp
+    )
+else()
+    message(SEND_ERROR "Platform is not supported")
+endif()
+
 bunsan_add_shared_library(${PROJECT_NAME}
     src/process/error.cpp
     src/process/execute.cpp
     src/process/aliases.cpp
+
+    ${platform_sources}
 
     src/interprocess/sync/file_lock.cpp
     src/interprocess/sync/file_guard.cpp
