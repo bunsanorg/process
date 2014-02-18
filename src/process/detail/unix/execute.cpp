@@ -5,6 +5,7 @@
 #include <bunsan/system_error.hpp>
 
 #include <boost/assert.hpp>
+#include <boost/filesystem/operations.hpp>
 
 #include <iostream>
 
@@ -58,6 +59,7 @@ namespace bunsan{namespace process{namespace detail
             BOOST_ASSERT(pid == 0);
             try
             {
+                boost::filesystem::current_path(ctx.current_path);
                 exec_.exec();
             }
             catch (std::exception &e)
