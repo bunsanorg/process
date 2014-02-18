@@ -10,6 +10,7 @@ bunsan_use_bunsan(common)
 bunsan_use_boost(system filesystem serialization thread)
 
 if(UNIX)
+    set(platform_tests unix)
     set(platform_sources
         src/process/detail/unix/path.cpp
         src/process/detail/unix/execute.cpp
