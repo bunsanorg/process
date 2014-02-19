@@ -3,14 +3,10 @@
 #include <bunsan/get.hpp>
 
 #include <boost/filesystem/path.hpp>
+#include <boost/none.hpp>
 #include <boost/operators.hpp>
 #include <boost/optional.hpp>
-#include <boost/serialization/access.hpp>
-#include <boost/serialization/nvp.hpp>
-
-#include <boost/serialization/optional.hpp>
-#include <bunsan/serialization/path.hpp>
-#include <boost/serialization/vector.hpp>
+#include <boost/variant.hpp>
 
 #include <string>
 #include <vector>
@@ -19,18 +15,12 @@ namespace bunsan{namespace process
 {
     class context: public boost::equality_comparable<context>
     {
-        friend class boost::serialization::access;
-
-#define BUNSAN_PROCESS_CONTEXT_NVP(X) boost::serialization::make_nvp(#X, m_##X)
-        template <typename Archive>
-        void serialize(Archive &ar, const unsigned int /*version*/)
-        {
-            ar & BUNSAN_PROCESS_CONTEXT_NVP(current_path);
-            ar & BUNSAN_PROCESS_CONTEXT_NVP(executable);
-            ar & BUNSAN_PROCESS_CONTEXT_NVP(arguments);
-            ar & BUNSAN_PROCESS_CONTEXT_NVP(use_path);
-        }
-#undef BUNSAN_PROCESS_CONTEXT_NVP
+    public:
+        typedef boost::variant<
+            boost::none_t,
+            std::string,
+            boost::filesystem::path
+        > stdin_data_type;
 
     public:
         context()=default;
@@ -61,7 +51,8 @@ namespace bunsan{namespace process
             return m_current_path == ctx.m_current_path &&
                    m_executable == ctx.m_executable &&
                    m_arguments == ctx.m_arguments &&
-                   m_use_path == ctx.m_use_path;
+                   m_use_path == ctx.m_use_path &&
+                   m_stdin_data == ctx.m_stdin_data;
         }
 
         void reset() noexcept
@@ -70,6 +61,7 @@ namespace bunsan{namespace process
             m_executable.reset();
             m_arguments.clear();
             m_use_path.reset();
+            m_stdin_data = boost::none;
         }
 
         inline void swap(context &ctx) noexcept
@@ -79,6 +71,7 @@ namespace bunsan{namespace process
             swap(m_executable, ctx.m_executable);
             swap(m_arguments, ctx.m_arguments);
             swap(m_use_path, ctx.m_use_path);
+            swap(m_stdin_data, ctx.m_stdin_data);
         }
 
         // current path
@@ -208,6 +201,22 @@ namespace bunsan{namespace process
             return get(m_use_path, "use_path member was not initialized");
         }
 
+        // stdin data
+        inline context &stdin_data(const std::string &data)
+        {
+            m_stdin_data = data;
+            return *this;
+        }
+        inline context &stdin_file(const boost::filesystem::path &path)
+        {
+            m_stdin_data = path;
+            return *this;
+        }
+        inline const stdin_data_type &stdin_data() const
+        {
+            return m_stdin_data;
+        }
+
         // build functions
         /*!
          * \brief prepare context to execution
@@ -235,6 +244,7 @@ namespace bunsan{namespace process
         boost::optional<boost::filesystem::path> m_executable;
         std::vector<std::string> m_arguments;
         boost::optional<bool> m_use_path;
+        stdin_data_type m_stdin_data = boost::none;
     };
     inline void swap(context &a, context &b) noexcept
     {

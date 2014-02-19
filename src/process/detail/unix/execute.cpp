@@ -1,7 +1,9 @@
 #include <bunsan/process/detail/execute.hpp>
 
+#include "descriptor.hpp"
 #include "error.hpp"
 #include "executor.hpp"
+#include "open.hpp"
 
 #include <boost/assert.hpp>
 #include <boost/filesystem/operations.hpp>
@@ -16,6 +18,11 @@ namespace bunsan{namespace process{namespace detail
     int sync_execute(const context &ctx)
     {
         executor exec_(ctx.executable, ctx.arguments);
+        descriptor stdin_fd = open(
+            ctx.stdin_file ? *ctx.stdin_file : "/dev/null",
+            O_RDWR
+        );
+
         const pid_t pid = ::fork();
         if (pid < 0)
         {
@@ -57,6 +64,13 @@ namespace bunsan{namespace process{namespace detail
             try
             {
                 boost::filesystem::current_path(ctx.current_path);
+
+                {
+                    descriptor(STDIN_FILENO).close();
+                    stdin_fd = stdin_fd.dup2(STDIN_FILENO);
+                    BOOST_ASSERT(*stdin_fd == STDIN_FILENO);
+                }
+
                 exec_.exec();
             }
             catch (std::exception &e)

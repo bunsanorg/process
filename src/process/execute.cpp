@@ -5,11 +5,15 @@
 #include <bunsan/process/path.hpp>
 
 #include <bunsan/logging/legacy.hpp>
+#include <bunsan/filesystem/fstream.hpp>
+#include <bunsan/tempfile.hpp>
 
 #include <boost/assert.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/io/detail/quoted_manip.hpp> // for logging
+#include <boost/noncopyable.hpp>
+#include <boost/variant/static_visitor.hpp>
 
 #include <sstream> // for logging
 
@@ -29,6 +33,45 @@ int bunsan::process::sync_execute(bunsan::process::context &&ctx)
 
     ctx_.current_path = ctx.current_path();
     ctx_.arguments = ctx.arguments();
+
+    // prepare stdin
+    struct visitor:
+        boost::static_visitor<
+            boost::optional<
+                boost::filesystem::path
+            >
+        >,
+        private boost::noncopyable
+    {
+        boost::optional<boost::filesystem::path> operator()(
+            const boost::none_t &)
+        {
+            return boost::none;
+        }
+
+        boost::optional<boost::filesystem::path> operator()(
+            const boost::filesystem::path &path)
+        {
+            return path;
+        }
+
+        boost::optional<boost::filesystem::path> operator()(
+            const std::string &data)
+        {
+            stdin_tmp = tempfile::regular_file_in_tempdir();
+            bunsan::filesystem::ofstream fout(stdin_tmp.path());
+            BUNSAN_FILESYSTEM_FSTREAM_WRAP_BEGIN(fout)
+            {
+                fout << data;
+            }
+            BUNSAN_FILESYSTEM_FSTREAM_WRAP_END(fout)
+            fout.close();
+            return stdin_tmp.path();
+        }
+
+        tempfile stdin_tmp;
+    } vis;
+    ctx_.stdin_file = boost::apply_visitor(vis, ctx.stdin_data());
 
     { // begin logging section
         std::ostringstream sout;
