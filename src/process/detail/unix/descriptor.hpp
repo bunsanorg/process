@@ -27,6 +27,9 @@ namespace bunsan{namespace process{namespace detail
 
         inline void swap(descriptor &o) noexcept { m_fd.swap(o.m_fd); }
 
+        descriptor dup() const;
+        descriptor dup2(const int min_fd) const;
+
     private:
         boost::optional<int> m_fd;
     };
