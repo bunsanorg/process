@@ -1,8 +1,7 @@
 #include <bunsan/process/detail/execute.hpp>
 
+#include "error.hpp"
 #include "executor.hpp"
-
-#include <bunsan/system_error.hpp>
 
 #include <boost/assert.hpp>
 #include <boost/filesystem/operations.hpp>
@@ -14,8 +13,6 @@
 
 namespace bunsan{namespace process{namespace detail
 {
-    typedef boost::error_info<struct tag_pid, pid_t> unix_pid;
-
     int sync_execute(const context &ctx)
     {
         executor exec_(ctx.executable, ctx.arguments);
@@ -37,7 +34,7 @@ namespace bunsan{namespace process{namespace detail
                     {
                         BOOST_THROW_EXCEPTION(
                             system_error("waitpid") <<
-                            unix_pid(pid));
+                            system_error::pid(pid));
                     }
                 }
                 else
