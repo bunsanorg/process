@@ -157,6 +157,8 @@ void bunsan::process::context::build_()
 
         if (!m_use_path)
             m_use_path = m_executable->filename() == *m_executable;
+        if (*m_use_path && m_executable->is_absolute())
+            m_use_path = false;
         if (*m_use_path)
         {
             if (m_executable->empty())

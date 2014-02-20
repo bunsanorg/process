@@ -163,6 +163,18 @@ BOOST_FIXTURE_TEST_CASE(std_out_err_file, bunsan::testing::filesystem::tempfiles
     );
 }
 
+BOOST_AUTO_TEST_CASE(use_path)
+{
+    BOOST_CHECK_EQUAL(
+        bunsan::process::sync_execute(
+            bunsan::process::context().
+            executable("/bin/sh").
+            use_path(true)
+        ),
+        0
+    );
+}
+
 BOOST_AUTO_TEST_SUITE_END() // sync_execute
 
 BOOST_AUTO_TEST_SUITE_END() // unix
