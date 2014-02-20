@@ -36,7 +36,7 @@ namespace bunsan{namespace process{namespace detail
         }
 
         descriptor dup() const;
-        descriptor dup2(const int min_fd) const;
+        descriptor dup2(const int new_fd) const;
 
     private:
         boost::optional<int> m_fd;

@@ -78,16 +78,16 @@ namespace bunsan{namespace process{namespace detail
         return descriptor(fd);
     }
 
-    descriptor descriptor::dup2(const int min_fd) const
+    descriptor descriptor::dup2(const int new_fd) const
     {
         if (!*this)
             BOOST_THROW_EXCEPTION(descriptor_is_closed_error());
         BOOST_ASSERT(m_fd);
-        const int fd = ::dup2(*m_fd, min_fd);
+        const int fd = ::dup2(*m_fd, new_fd);
         if (fd < 0)
             BOOST_THROW_EXCEPTION(system_error("dup2") <<
                                   system_error::fd(*m_fd) <<
-                                  system_error::min_fd(min_fd));
+                                  system_error::new_fd(new_fd));
         return descriptor(fd);
     }
 

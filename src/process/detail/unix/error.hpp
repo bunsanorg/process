@@ -14,7 +14,7 @@ namespace bunsan{namespace process{namespace detail
 
         typedef boost::error_info<struct tag_pid, pid_t> pid;
         typedef boost::error_info<struct tag_fd, int> fd;
-        typedef boost::error_info<struct tag_min_fd, int> min_fd;
+        typedef boost::error_info<struct tag_new_fd, int> new_fd;
         typedef boost::error_info<struct tag_flags, int> flags;
         typedef boost::error_info<struct tag_mode, mode_t> mode;
     };
