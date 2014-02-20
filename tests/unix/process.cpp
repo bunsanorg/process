@@ -146,7 +146,8 @@ BOOST_FIXTURE_TEST_CASE(std_out_err_file, bunsan::testing::filesystem::tempfiles
         bunsan::process::sync_execute(
             bunsan::process::context().
                 executable("sh").
-                stdin_data("echo \"Hello, out world\"\necho \"Hello, err world\" >&2").
+                stdin_data("echo \"Hello, out world\"\n"
+                           "echo \"Hello, err world\" >&2").
                 stdout_file(path_out).
                 stderr_file(path_err)
         ),
