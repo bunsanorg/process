@@ -169,7 +169,7 @@ void bunsan::process::context::build_()
         else
         {
             // TODO if we do not use path,
-            // is it prefered to have absolute path to the executable file
+            // is it preferred to have absolute path to the executable file
             // or should we raise an exception?
             m_executable = boost::filesystem::absolute(m_executable.get());
         }
