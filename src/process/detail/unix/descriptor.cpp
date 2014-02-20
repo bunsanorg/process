@@ -10,22 +10,32 @@ namespace bunsan{namespace process{namespace detail
 {
     descriptor::~descriptor()
     {
-        close_no_except();
+        if (m_close)
+            close_no_except();
     }
 
     descriptor::descriptor(const int fd): m_fd(fd) {}
 
+    descriptor::descriptor(const int fd, const bool close):
+        m_fd(fd),
+        m_close(close) {}
+
     descriptor::descriptor(descriptor &&o)
     {
         swap(o);
-        o.close();
+        o.reset();
     }
 
     descriptor &descriptor::operator=(descriptor &&o)
     {
         swap(o);
-        o.close();
+        o.reset();
         return *this;
+    }
+
+    void descriptor::reset()
+    {
+        descriptor().swap(*this);
     }
 
     void descriptor::reset(const int fd)
@@ -79,5 +89,20 @@ namespace bunsan{namespace process{namespace detail
                                   system_error::fd(*m_fd) <<
                                   system_error::min_fd(min_fd));
         return descriptor(fd);
+    }
+
+    descriptor stdin_descriptor()
+    {
+        return descriptor(STDIN_FILENO, false);
+    }
+
+    descriptor stdout_descriptor()
+    {
+        return descriptor(STDOUT_FILENO, false);
+    }
+
+    descriptor stderr_descriptor()
+    {
+        return descriptor(STDERR_FILENO, false);
     }
 }}}
