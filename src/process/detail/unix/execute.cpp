@@ -7,6 +7,8 @@
 
 #include <boost/assert.hpp>
 #include <boost/filesystem/operations.hpp>
+#include <boost/noncopyable.hpp>
+#include <boost/variant/static_visitor.hpp>
 
 #include <iostream>
 
@@ -15,13 +17,76 @@
 
 namespace bunsan{namespace process{namespace detail
 {
+    class file_action_visitor:
+        public boost::static_visitor<void>,
+        private boost::noncopyable
+    {
+    public:
+        file_action_visitor(
+            const standard_file self,
+            const mode_t mode):
+                m_self(self),
+                m_mode(mode) {}
+
+        void operator()(inherit_type)
+        {
+            m_fd = standard(m_self);
+        }
+
+        void operator()(suppress_type)
+        {
+            m_fd = open("/dev/null", O_RDWR);
+        }
+
+        void operator()(const standard_file file)
+        {
+            m_fd = standard(file);
+        }
+
+        void operator()(const boost::filesystem::path &path)
+        {
+            m_fd = open(path, m_mode, 0666);
+        }
+
+        void dispatch()
+        {
+            const descriptor self_fd = standard(m_self);
+            if (*self_fd != *m_fd)
+                m_fd = m_fd.dup2(*self_fd);
+        }
+
+    private:
+        static descriptor standard(const standard_file file)
+        {
+            switch (file)
+            {
+            case stdin_file:
+                return stdin_descriptor();
+            case stdout_file:
+                return stdout_descriptor();
+            case stderr_file:
+                return stderr_descriptor();
+            default:
+                return descriptor();
+            }
+        }
+
+    private:
+        const standard_file m_self;
+        const mode_t m_mode;
+        descriptor m_fd;
+    };
+
     int sync_execute(const context &ctx)
     {
         executor exec_(ctx.executable, ctx.arguments);
-        descriptor stdin_fd = open(
-            ctx.stdin_file ? *ctx.stdin_file : "/dev/null",
-            O_RDWR
-        );
+
+        file_action_visitor stdin_visitor(stdin_file, O_RDONLY);
+        file_action_visitor stdout_visitor(stdout_file, O_WRONLY | O_CREAT | O_TRUNC);
+        file_action_visitor stderr_visitor(stderr_file, O_WRONLY | O_CREAT | O_TRUNC);
+        boost::apply_visitor(stdin_visitor, ctx.stdin_file);
+        boost::apply_visitor(stdout_visitor, ctx.stdout_file);
+        boost::apply_visitor(stderr_visitor, ctx.stderr_file);
 
         const pid_t pid = ::fork();
         if (pid < 0)
@@ -65,11 +130,9 @@ namespace bunsan{namespace process{namespace detail
             {
                 boost::filesystem::current_path(ctx.current_path);
 
-                {
-                    descriptor(STDIN_FILENO).close();
-                    stdin_fd = stdin_fd.dup2(STDIN_FILENO);
-                    BOOST_ASSERT(*stdin_fd == STDIN_FILENO);
-                }
+                stdin_visitor.dispatch();
+                stdout_visitor.dispatch();
+                stderr_visitor.dispatch();
 
                 exec_.exec();
             }

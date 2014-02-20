@@ -1,12 +1,12 @@
 #pragma once
 
+#include <bunsan/process/file_action.hpp>
+
 #include <bunsan/get.hpp>
 
 #include <boost/filesystem/path.hpp>
-#include <boost/none.hpp>
 #include <boost/operators.hpp>
 #include <boost/optional.hpp>
-#include <boost/variant.hpp>
 
 #include <string>
 #include <vector>
@@ -15,13 +15,6 @@ namespace bunsan{namespace process
 {
     class context: public boost::equality_comparable<context>
     {
-    public:
-        typedef boost::variant<
-            boost::none_t,
-            std::string,
-            boost::filesystem::path
-        > stdin_data_type;
-
     public:
         context()=default;
         context(const context &)=default;
@@ -52,7 +45,9 @@ namespace bunsan{namespace process
                    m_executable == ctx.m_executable &&
                    m_arguments == ctx.m_arguments &&
                    m_use_path == ctx.m_use_path &&
-                   m_stdin_data == ctx.m_stdin_data;
+                   m_stdin_data == ctx.m_stdin_data &&
+                   m_stdout_data == ctx.m_stdout_data &&
+                   m_stderr_data == ctx.m_stderr_data;
         }
 
         void reset() noexcept
@@ -62,6 +57,8 @@ namespace bunsan{namespace process
             m_arguments.clear();
             m_use_path.reset();
             m_stdin_data = boost::none;
+            m_stdout_data = boost::none;
+            m_stderr_data = boost::none;
         }
 
         inline void swap(context &ctx) noexcept
@@ -72,6 +69,8 @@ namespace bunsan{namespace process
             swap(m_arguments, ctx.m_arguments);
             swap(m_use_path, ctx.m_use_path);
             swap(m_stdin_data, ctx.m_stdin_data);
+            swap(m_stdout_data, ctx.m_stdout_data);
+            swap(m_stderr_data, ctx.m_stderr_data);
         }
 
         // current path
@@ -202,6 +201,16 @@ namespace bunsan{namespace process
         }
 
         // stdin data
+        inline context &stdin_inherit()
+        {
+            m_stdin_data = inherit;
+            return *this;
+        }
+        inline context &stdin_suppress()
+        {
+            m_stdin_data = suppress;
+            return *this;
+        }
         inline context &stdin_data(const std::string &data)
         {
             m_stdin_data = data;
@@ -215,6 +224,53 @@ namespace bunsan{namespace process
         inline const stdin_data_type &stdin_data() const
         {
             return m_stdin_data;
+        }
+
+        // stdout data
+        inline context &stdout_inherit()
+        {
+            m_stdout_data = inherit;
+            return *this;
+        }
+        inline context &stdout_suppress()
+        {
+            m_stdout_data = suppress;
+            return *this;
+        }
+        inline context &stdout_file(const boost::filesystem::path &path)
+        {
+            m_stdout_data = path;
+            return *this;
+        }
+        inline const stdout_data_type &stdout_data() const
+        {
+            return m_stdout_data;
+        }
+
+        // stderr data
+        inline context &stderr_inherit()
+        {
+            m_stderr_data = inherit;
+            return *this;
+        }
+        inline context &stderr_suppress()
+        {
+            m_stderr_data = suppress;
+            return *this;
+        }
+        inline context &stderr_redirect_to_stdout()
+        {
+            m_stderr_data = redirect_to_stdout;
+            return *this;
+        }
+        inline context &stderr_file(const boost::filesystem::path &path)
+        {
+            m_stderr_data = path;
+            return *this;
+        }
+        inline const stderr_data_type &stderr_data() const
+        {
+            return m_stderr_data;
         }
 
         // build functions
@@ -245,6 +301,8 @@ namespace bunsan{namespace process
         std::vector<std::string> m_arguments;
         boost::optional<bool> m_use_path;
         stdin_data_type m_stdin_data = boost::none;
+        stdout_data_type m_stdout_data = boost::none;
+        stderr_data_type m_stderr_data = boost::none;
     };
     inline void swap(context &a, context &b) noexcept
     {

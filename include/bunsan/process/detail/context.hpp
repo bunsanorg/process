@@ -1,5 +1,7 @@
 #pragma once
 
+#include <bunsan/process/detail/file_action.hpp>
+
 #include <boost/filesystem/path.hpp>
 #include <boost/optional.hpp>
 
@@ -13,6 +15,6 @@ namespace bunsan{namespace process{namespace detail
         boost::filesystem::path executable;
         boost::filesystem::path current_path;
         std::vector<std::string> arguments;
-        boost::optional<boost::filesystem::path> stdin_file;
+        file_action stdin_file, stdout_file, stderr_file;
     };
 }}}

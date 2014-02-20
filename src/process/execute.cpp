@@ -2,6 +2,7 @@
 
 #include <bunsan/process/detail/context.hpp>
 #include <bunsan/process/detail/execute.hpp>
+#include <bunsan/process/detail/file_action.hpp>
 #include <bunsan/process/path.hpp>
 
 #include <bunsan/logging/legacy.hpp>
@@ -16,6 +17,85 @@
 #include <boost/variant/static_visitor.hpp>
 
 #include <sstream> // for logging
+
+namespace bunsan{namespace process{namespace
+{
+    struct forward_file_action_visitor:
+        boost::static_visitor<detail::file_action>,
+        private boost::noncopyable
+    {
+        detail::file_action operator()(
+            const inherit_type &)
+        {
+            return inherit;
+        }
+
+        detail::file_action operator()(
+            const suppress_type &)
+        {
+            return suppress;
+        }
+
+        detail::file_action operator()(
+            const boost::filesystem::path &path)
+        {
+            return path;
+        }
+    };
+
+    struct stdin_file_action_visitor:
+        forward_file_action_visitor
+    {
+        using forward_file_action_visitor::operator();
+
+        detail::file_action operator()(boost::none_t)
+        {
+            return suppress;
+        }
+
+        detail::file_action operator()(const std::string &data)
+        {
+            stdin_tmp = tempfile::regular_file_in_tempdir();
+            bunsan::filesystem::ofstream fout(stdin_tmp.path());
+            BUNSAN_FILESYSTEM_FSTREAM_WRAP_BEGIN(fout)
+            {
+                fout << data;
+            }
+            BUNSAN_FILESYSTEM_FSTREAM_WRAP_END(fout)
+            fout.close();
+            return stdin_tmp.path();
+        }
+
+        tempfile stdin_tmp;
+    };
+
+    struct stdout_file_action_visitor:
+        forward_file_action_visitor
+    {
+        using forward_file_action_visitor::operator();
+
+        detail::file_action operator()(boost::none_t)
+        {
+            return inherit;
+        }
+    };
+
+    struct stderr_file_action_visitor:
+        forward_file_action_visitor
+    {
+        using forward_file_action_visitor::operator();
+
+        detail::file_action operator()(boost::none_t)
+        {
+            return inherit;
+        }
+
+        detail::file_action operator()(redirect_to_stdout_type)
+        {
+            return detail::stdout_file;
+        }
+    };
+}}}
 
 int bunsan::process::sync_execute(bunsan::process::context &&ctx)
 {
@@ -34,44 +114,12 @@ int bunsan::process::sync_execute(bunsan::process::context &&ctx)
     ctx_.current_path = ctx.current_path();
     ctx_.arguments = ctx.arguments();
 
-    // prepare stdin
-    struct visitor:
-        boost::static_visitor<
-            boost::optional<
-                boost::filesystem::path
-            >
-        >,
-        private boost::noncopyable
-    {
-        boost::optional<boost::filesystem::path> operator()(
-            const boost::none_t &)
-        {
-            return boost::none;
-        }
-
-        boost::optional<boost::filesystem::path> operator()(
-            const boost::filesystem::path &path)
-        {
-            return path;
-        }
-
-        boost::optional<boost::filesystem::path> operator()(
-            const std::string &data)
-        {
-            stdin_tmp = tempfile::regular_file_in_tempdir();
-            bunsan::filesystem::ofstream fout(stdin_tmp.path());
-            BUNSAN_FILESYSTEM_FSTREAM_WRAP_BEGIN(fout)
-            {
-                fout << data;
-            }
-            BUNSAN_FILESYSTEM_FSTREAM_WRAP_END(fout)
-            fout.close();
-            return stdin_tmp.path();
-        }
-
-        tempfile stdin_tmp;
-    } vis;
-    ctx_.stdin_file = boost::apply_visitor(vis, ctx.stdin_data());
+    stdin_file_action_visitor stdin_visitor;
+    stdout_file_action_visitor stdout_visitor;
+    stderr_file_action_visitor stderr_visitor;
+    ctx_.stdin_file = boost::apply_visitor(stdin_visitor, ctx.stdin_data());
+    ctx_.stdout_file = boost::apply_visitor(stdout_visitor, ctx.stdout_data());
+    ctx_.stderr_file = boost::apply_visitor(stderr_visitor, ctx.stderr_data());
 
     { // begin logging section
         std::ostringstream sout;
