@@ -20,8 +20,8 @@ BOOST_AUTO_TEST_CASE(exit_status)
     BOOST_CHECK_EQUAL(
         bunsan::process::sync_execute(
             bunsan::process::context().
-                executable("sh").
-                arguments("sh", "-c", "exit 10")
+            executable("sh").
+            arguments("sh", "-c", "exit 10")
         ),
         10
     );
@@ -29,8 +29,8 @@ BOOST_AUTO_TEST_CASE(exit_status)
     BOOST_CHECK_EQUAL(
         bunsan::process::sync_execute(
             bunsan::process::context().
-                executable("sh").
-                arguments("sh", "-c", "kill -10 $$")
+            executable("sh").
+            arguments("sh", "-c", "kill -10 $$")
         ),
         -10
     );
@@ -41,8 +41,8 @@ BOOST_AUTO_TEST_CASE(stdin_data)
     BOOST_CHECK_EQUAL(
         bunsan::process::sync_execute(
             bunsan::process::context().
-                executable("sh").
-                stdin_data("exit 11")
+            executable("sh").
+            stdin_data("exit 11")
         ),
         11
     );
@@ -51,8 +51,8 @@ BOOST_AUTO_TEST_CASE(stdin_data)
     BOOST_CHECK_EQUAL(
         bunsan::process::sync_execute(
             bunsan::process::context().
-                executable("sh").
-                stdin_file(path)
+            executable("sh").
+            stdin_file(path)
         ),
         12
     );
@@ -60,9 +60,9 @@ BOOST_AUTO_TEST_CASE(stdin_data)
     BOOST_CHECK_EQUAL(
         bunsan::process::sync_execute(
             bunsan::process::context().
-                executable("sh").
-                arguments("sh", "-c", "read x || exit 15").
-                stdin_suppress()
+            executable("sh").
+            arguments("sh", "-c", "read x || exit 15").
+            stdin_suppress()
         ),
         15
     );
@@ -74,8 +74,8 @@ BOOST_AUTO_TEST_CASE(stdin_file)
     BOOST_CHECK_EQUAL(
         bunsan::process::sync_execute(
             bunsan::process::context().
-                executable("sh").
-                stdin_file(path)
+            executable("sh").
+            stdin_file(path)
         ),
         -13
     );
@@ -83,8 +83,8 @@ BOOST_AUTO_TEST_CASE(stdin_file)
     BOOST_CHECK_EQUAL(
         bunsan::process::sync_execute(
             bunsan::process::context().
-                executable("sh").
-                stdin_file(path)
+            executable("sh").
+            stdin_file(path)
         ),
         -13
     );
@@ -95,9 +95,9 @@ BOOST_AUTO_TEST_CASE(stdout_file)
     BOOST_CHECK_EQUAL(
         bunsan::process::sync_execute(
             bunsan::process::context().
-                executable("sh").
-                stdin_data("echo \"Hello, world\"").
-                stdout_file(path)
+            executable("sh").
+            stdin_data("echo \"Hello, world\"").
+            stdout_file(path)
         ),
         0
     );
@@ -112,9 +112,9 @@ BOOST_AUTO_TEST_CASE(stderr_file)
     BOOST_CHECK_EQUAL(
         bunsan::process::sync_execute(
             bunsan::process::context().
-                executable("sh").
-                stdin_data("echo \"Hello, world\" >&2").
-                stderr_file(path)
+            executable("sh").
+            stdin_data("echo \"Hello, world\" >&2").
+            stderr_file(path)
         ),
         0
     );
@@ -126,10 +126,10 @@ BOOST_AUTO_TEST_CASE(stderr_file)
     BOOST_CHECK_EQUAL(
         bunsan::process::sync_execute(
             bunsan::process::context().
-                executable("sh").
-                stdin_data("echo \"Hello, world\" >&2").
-                stdout_file(path).
-                stderr_redirect_to_stdout()
+            executable("sh").
+            stdin_data("echo \"Hello, world\" >&2").
+            stdout_file(path).
+            stderr_redirect_to_stdout()
         ),
         0
     );
@@ -145,11 +145,11 @@ BOOST_FIXTURE_TEST_CASE(std_out_err_file, bunsan::testing::filesystem::tempfiles
     BOOST_CHECK_EQUAL(
         bunsan::process::sync_execute(
             bunsan::process::context().
-                executable("sh").
-                stdin_data("echo \"Hello, out world\"\n"
-                           "echo \"Hello, err world\" >&2").
-                stdout_file(path_out).
-                stderr_file(path_err)
+            executable("sh").
+            stdin_data("echo \"Hello, out world\"\n"
+                       "echo \"Hello, err world\" >&2").
+            stdout_file(path_out).
+            stderr_file(path_err)
         ),
         0
     );
