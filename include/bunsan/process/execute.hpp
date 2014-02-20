@@ -17,14 +17,14 @@ namespace bunsan{namespace process
     int sync_execute(context &&ctx);
 
     inline int sync_execute(
-        const boost::filesystem::path &cwd,
+        const boost::filesystem::path &current_path,
         const boost::filesystem::path &executable,
         const std::vector<std::string> &arguments,
         bool use_path=true)
     {
         return sync_execute(
             context().
-            current_path(cwd).
+            current_path(current_path).
             executable(executable).
             arguments(arguments).
             use_path(use_path)
@@ -32,13 +32,13 @@ namespace bunsan{namespace process
     }
 
     inline int sync_execute(
-        const boost::filesystem::path &cwd,
+        const boost::filesystem::path &current_path,
         const std::vector<std::string> &arguments,
         bool use_path=true)
     {
         return sync_execute(
             context().
-            current_path(cwd).
+            current_path(current_path).
             arguments(arguments).
             use_path(use_path)
         );
