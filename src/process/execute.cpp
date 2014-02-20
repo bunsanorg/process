@@ -156,22 +156,22 @@ void bunsan::process::context::build_()
             m_current_path = boost::filesystem::current_path();
 
         if (!m_use_path)
-            m_use_path = m_executable->filename() == m_executable.get();
-        if (m_use_path.get())
+            m_use_path = m_executable->filename() == *m_executable;
+        if (*m_use_path)
         {
             if (m_executable->empty())
                 BOOST_THROW_EXCEPTION(empty_executable_error());
-            if (m_executable.get() != m_executable->filename())
+            if (*m_executable != m_executable->filename())
                 BOOST_THROW_EXCEPTION(
                     non_basename_executable_error() <<
-                    non_basename_executable_error::executable(m_executable.get()));
+                    non_basename_executable_error::executable(*m_executable));
         }
         else
         {
             // TODO if we do not use path,
             // is it preferred to have absolute path to the executable file
             // or should we raise an exception?
-            m_executable = boost::filesystem::absolute(m_executable.get());
+            m_executable = boost::filesystem::absolute(*m_executable);
         }
     }
     catch (std::exception &)
