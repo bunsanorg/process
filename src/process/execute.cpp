@@ -102,7 +102,7 @@ int bunsan::process::sync_execute(bunsan::process::context &&ctx)
     ctx.build();
     SLOG("attempt to execute " << ctx.executable() <<
          " in " << ctx.current_path() <<
-         (ctx.use_path() ? " ":" without") << " using path");
+         (ctx.use_path() ? " " : " without") << " using path");
 
     detail::context ctx_;
 
