@@ -27,6 +27,7 @@ namespace bunsan{namespace process
     struct non_basename_executable_error: virtual invalid_executable_error {};
 
     struct sync_execute_error: virtual error {};
+    struct sync_execute_with_output_error: virtual sync_execute_error {};
 
     struct check_sync_execute_error: virtual error {};
     struct non_zero_exit_status_error: virtual check_sync_execute_error {};

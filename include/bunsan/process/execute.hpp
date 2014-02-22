@@ -13,44 +13,57 @@
 namespace bunsan{namespace process
 {
     int sync_execute(const context &ctx);
-
     int sync_execute(context &&ctx);
-
-    inline int sync_execute(
-        const boost::filesystem::path &current_path,
-        const boost::filesystem::path &executable,
-        const std::vector<std::string> &arguments,
-        bool use_path=true)
+    inline int sync_execute(context &ctx)
     {
-        return sync_execute(
-            context().
-            current_path(current_path).
-            executable(executable).
-            arguments(arguments).
-            use_path(use_path)
-        );
+        return sync_execute(static_cast<const context &>(ctx));
     }
 
-    inline int sync_execute(
-        const boost::filesystem::path &current_path,
-        const std::vector<std::string> &arguments,
-        bool use_path=true)
+    // may alter stdout and stderr of context
+    int sync_execute_with_output(const context &ctx, std::string &output);
+    int sync_execute_with_output(context &&ctx, std::string &output);
+    inline int sync_execute_with_output(context &ctx, std::string &output)
+    {
+        return sync_execute_with_output(static_cast<const context &>(ctx), output);
+    }
+
+    void check_sync_execute(const context &ctx);
+    void check_sync_execute(context &&ctx);
+    inline void check_sync_execute(context &ctx)
+    {
+        check_sync_execute(static_cast<const context &>(ctx));
+    }
+
+    void check_sync_execute_with_output(const context &ctx);
+    void check_sync_execute_with_output(context &&ctx);
+    inline void check_sync_execute_with_output(context &ctx)
+    {
+        check_sync_execute_with_output(static_cast<const context &>(ctx));
+    }
+
+    // convenient aliases
+
+    template <typename ... Args>
+    inline int sync_execute(Args &&...args)
     {
         return sync_execute(
-            context().
-            current_path(current_path).
-            arguments(arguments).
-            use_path(use_path)
+            context().arguments(std::forward<Args>(args)...)
         );
     }
 
     template <typename ... Args>
-    void check_sync_execute(Args &&...args)
+    inline void check_sync_execute(Args &&...args)
     {
-        const int exit_status = sync_execute(std::forward<Args>(args)...);
-        if (exit_status)
-            BOOST_THROW_EXCEPTION(
-                non_zero_exit_status_error() <<
-                non_zero_exit_status_error::exit_status(exit_status));
+        check_sync_execute(
+            context().arguments(std::forward<Args>(args)...)
+        );
+    }
+
+    template <typename ... Args>
+    inline void check_sync_execute_with_output(Args &&...args)
+    {
+        check_sync_execute_with_output(
+            context().arguments(std::forward<Args>(args)...)
+        );
     }
 }}

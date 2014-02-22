@@ -175,6 +175,21 @@ BOOST_AUTO_TEST_CASE(use_path)
     );
 }
 
+BOOST_AUTO_TEST_CASE(with_output)
+{
+    std::string output;
+    BOOST_CHECK_EQUAL(
+        bunsan::process::sync_execute_with_output(
+            bunsan::process::context().
+            executable("sh").
+            stdin_data("echo \"Hello, world\""),
+            output
+        ),
+        0
+    );
+    BOOST_CHECK_EQUAL(output, "Hello, world");
+}
+
 BOOST_AUTO_TEST_SUITE_END() // sync_execute
 
 BOOST_AUTO_TEST_SUITE_END() // unix
