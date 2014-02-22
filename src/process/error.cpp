@@ -1,6 +1,19 @@
 #include <bunsan/process/error.hpp>
 
+#include <bunsan/process/context.hpp>
+
+#include <boost/io/detail/quoted_manip.hpp>
+
 #include <sstream>
+
+std::string boost::to_string(
+    const bunsan::process::error::context &context)
+{
+    std::ostringstream sout;
+    sout << '[' << bunsan::error::info_name(context) << "] = ";
+    sout << to_string(context.value()) << '\n';
+    return sout.str();
+}
 
 std::string boost::to_string(
     const bunsan::process::error::arguments &arguments)

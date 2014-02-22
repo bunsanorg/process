@@ -1,5 +1,6 @@
 #pragma once
 
+#include <bunsan/process/context_forward.hpp>
 #include <bunsan/process/file_action.hpp>
 
 #include <bunsan/get.hpp>
@@ -295,6 +296,9 @@ namespace bunsan{namespace process
 
     private:
         void build_();
+
+        friend std::string boost::to_string(
+            const bunsan::process::context &context);
 
         boost::optional<boost::filesystem::path> m_current_path;
         boost::optional<boost::filesystem::path> m_executable;

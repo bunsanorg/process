@@ -1,5 +1,7 @@
 #pragma once
 
+#include <bunsan/process/context.hpp>
+
 #include <bunsan/error.hpp>
 
 #include <boost/filesystem/path.hpp>
@@ -11,6 +13,7 @@ namespace bunsan{namespace process
 {
     struct error: virtual bunsan::error
     {
+        typedef boost::error_info<struct tag_context, process::context> context;
         typedef boost::error_info<struct tag_executable, boost::filesystem::path> executable;
         typedef boost::error_info<struct tag_arguments, std::vector<std::string>> arguments;
         typedef boost::error_info<struct tag_exit_status, int> exit_status;
@@ -40,5 +43,6 @@ namespace bunsan{namespace process
 
 namespace boost
 {
+    std::string to_string(const bunsan::process::error::context &context);
     std::string to_string(const bunsan::process::error::arguments &arguments);
 }
