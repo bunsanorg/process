@@ -1,10 +1,20 @@
 #include <bunsan/process/error.hpp>
 
-using namespace bunsan::process;
+#include <sstream>
 
-error::error(const std::string &message_): bunsan::error(message_) {}
-
-non_zero_exit_status_error::non_zero_exit_status_error(int exit_status_)
+std::string boost::to_string(
+    const bunsan::process::error::arguments &arguments)
 {
-    (*this) << exit_status(exit_status_);
+    std::ostringstream sout;
+    sout << '[' << bunsan::error::info_name(arguments) << "] = ";
+    bool first = true;
+    for (const std::string &argument: arguments.value()) {
+        if (!first) {
+            sout << ", ";
+        }
+        sout << argument;
+        first = false;
+    }
+    sout << '\n';
+    return sout.str();
 }

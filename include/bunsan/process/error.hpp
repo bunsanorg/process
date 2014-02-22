@@ -4,27 +4,17 @@
 
 #include <boost/filesystem/path.hpp>
 
+#include <string>
+#include <vector>
+
 namespace bunsan{namespace process
 {
     struct error: virtual bunsan::error
     {
-        error()=default;
-
-        /// \see bunsan::error::message
-        explicit error(const std::string &message_);
-
         typedef boost::error_info<struct tag_executable, boost::filesystem::path> executable;
-    };
-
-    struct non_zero_exit_status_error: virtual error
-    {
-        non_zero_exit_status_error()=default;
-
-        /// \see exit_status
-        explicit non_zero_exit_status_error(int exit_status_);
-
-        /// Program exit status
+        typedef boost::error_info<struct tag_arguments, std::vector<std::string>> arguments;
         typedef boost::error_info<struct tag_exit_status, int> exit_status;
+        typedef boost::error_info<struct tag_output, std::string> output;
     };
 
     struct nothing_to_execute_error: virtual error {};
@@ -35,6 +25,9 @@ namespace bunsan{namespace process
 
     struct sync_execute_error: virtual error {};
 
+    struct check_sync_execute_error: virtual error {};
+    struct non_zero_exit_status_error: virtual check_sync_execute_error {};
+
     struct context_error: virtual error {};
     struct context_build_error: virtual context_error {};
 
@@ -44,3 +37,8 @@ namespace bunsan{namespace process
     struct empty_environment_path_error: virtual environment_path_error {};
     struct no_executable_in_path_error: virtual find_executable_in_path_error {};
 }}
+
+namespace boost
+{
+    std::string to_string(const bunsan::process::error::arguments &arguments);
+}

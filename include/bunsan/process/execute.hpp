@@ -47,9 +47,10 @@ namespace bunsan{namespace process
     template <typename ... Args>
     void check_sync_execute(Args &&...args)
     {
-        const int exit_status_ = sync_execute(std::forward<Args>(args)...);
-        if (exit_status_)
+        const int exit_status = sync_execute(std::forward<Args>(args)...);
+        if (exit_status)
             BOOST_THROW_EXCEPTION(
-                bunsan::process::non_zero_exit_status_error(exit_status_));
+                non_zero_exit_status_error() <<
+                non_zero_exit_status_error::exit_status(exit_status));
     }
 }}
