@@ -99,43 +99,54 @@ namespace bunsan{namespace process{namespace
 
 int bunsan::process::sync_execute(bunsan::process::context &&ctx)
 {
-    ctx.build();
-    SLOG("attempt to execute " << ctx.executable() <<
-         " in " << ctx.current_path() <<
-         (ctx.use_path() ? " " : " without") << " using path");
+    try
+    {
+        ctx.build();
 
-    detail::context ctx_;
+        SLOG("attempt to execute " << ctx.executable() <<
+             " in " << ctx.current_path() <<
+             (ctx.use_path() ? " " : " without") << " using path");
 
-    if (ctx.use_path())
-        ctx_.executable = find_executable_in_path(ctx.executable());
-    else
-        ctx_.executable = ctx.executable();
+        detail::context ctx_;
 
-    ctx_.current_path = ctx.current_path();
-    ctx_.arguments = ctx.arguments();
+        if (ctx.use_path())
+            ctx_.executable = find_executable_in_path(ctx.executable());
+        else
+            ctx_.executable = ctx.executable();
 
-    stdin_file_action_visitor stdin_visitor;
-    stdout_file_action_visitor stdout_visitor;
-    stderr_file_action_visitor stderr_visitor;
-    ctx_.stdin_file = boost::apply_visitor(stdin_visitor, ctx.stdin_data());
-    ctx_.stdout_file = boost::apply_visitor(stdout_visitor, ctx.stdout_data());
-    ctx_.stderr_file = boost::apply_visitor(stderr_visitor, ctx.stderr_data());
+        ctx_.current_path = ctx.current_path();
+        ctx_.arguments = ctx.arguments();
 
-    { // begin logging section
-        std::ostringstream sout;
-        sout << "executing " << ctx_.executable << " in " <<
-                ctx_.current_path << " with arguments = [";
-        for (std::size_t i = 0; i < ctx_.arguments.size(); ++i)
-        {
-            if (i)
-                sout << ", ";
-            sout << boost::io::quoted(ctx_.arguments[i]);
-        }
-        sout << ']';
-        SLOG(sout.str());
-    } // end logging section
+        stdin_file_action_visitor stdin_visitor;
+        stdout_file_action_visitor stdout_visitor;
+        stderr_file_action_visitor stderr_visitor;
+        ctx_.stdin_file = boost::apply_visitor(stdin_visitor, ctx.stdin_data());
+        ctx_.stdout_file = boost::apply_visitor(stdout_visitor, ctx.stdout_data());
+        ctx_.stderr_file = boost::apply_visitor(stderr_visitor, ctx.stderr_data());
 
-    return detail::sync_execute(ctx_);
+        { // begin logging section
+            std::ostringstream sout;
+            sout << "executing " << ctx_.executable << " in " <<
+                    ctx_.current_path << " with arguments = [";
+            for (std::size_t i = 0; i < ctx_.arguments.size(); ++i)
+            {
+                if (i)
+                    sout << ", ";
+                sout << boost::io::quoted(ctx_.arguments[i]);
+            }
+            sout << ']';
+            SLOG(sout.str());
+        } // end logging section
+
+        return detail::sync_execute(ctx_);
+    }
+    catch (std::exception &)
+    {
+        BOOST_THROW_EXCEPTION(
+            sync_execute_error() <<
+            sync_execute_error::context(ctx) <<
+            enable_nested_current());
+    }
 }
 
 void bunsan::process::context::build_()
