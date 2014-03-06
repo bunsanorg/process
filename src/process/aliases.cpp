@@ -6,6 +6,8 @@
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/trim.hpp>
 
+#include <cstdlib>
+
 namespace bunsan{namespace process{namespace
 {
     template <typename Error>
@@ -20,10 +22,16 @@ namespace bunsan{namespace process{namespace
 
     void check_sync_execute_with_optional_output(
         const context &ctx,
-        const bool with_output)
+        bool with_output)
     {
         try
         {
+            if (with_output)
+            {
+                const char *const inherit = std::getenv("BUNSAN_PROCESS_INHERIT");
+                if (inherit)
+                    with_output = false;
+            }
             std::string output;
             const int exit_status =
                 with_output ?

@@ -34,6 +34,10 @@ namespace bunsan{namespace process
         check_sync_execute(static_cast<const context &>(ctx));
     }
 
+    /*!
+     * \note If BUNSAN_PROCESS_INHERIT environment is set
+     * function behaves exactly like check_sync_execute().
+     */
     void check_sync_execute_with_output(const context &ctx);
     void check_sync_execute_with_output(context &&ctx);
     inline void check_sync_execute_with_output(context &ctx)

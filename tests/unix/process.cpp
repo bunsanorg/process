@@ -9,6 +9,8 @@
 
 #include <bunsan/process/execute.hpp>
 
+#include <stdlib.h> // setenv(), unsetenv()
+
 BOOST_AUTO_TEST_SUITE(process)
 
 BOOST_AUTO_TEST_SUITE(unix)
@@ -188,6 +190,53 @@ BOOST_AUTO_TEST_CASE(with_output)
         0
     );
     BOOST_CHECK_EQUAL(output, "Hello, world");
+
+    BOOST_REQUIRE(!getenv("BUNSAN_PROCESS_INHERIT"));
+    BOOST_CHECK_EXCEPTION(
+        bunsan::process::check_sync_execute_with_output(
+            bunsan::process::context().
+            executable("sh").
+            stdin_data("echo \"Hello, world\" && exit 1")
+        ),
+        bunsan::process::check_sync_execute_error,
+        [](const bunsan::process::check_sync_execute_error &e)
+        {
+            const std::string *const output =
+                e.get<bunsan::process::check_sync_execute_error::output>();
+            return output && *output == "Hello, world";
+        }
+    );
+}
+
+struct bunsan_process_inherit_setter
+{
+    bunsan_process_inherit_setter()
+    {
+        BOOST_REQUIRE_EQUAL(setenv("BUNSAN_PROCESS_INHERIT", "1", 1), 0);
+    }
+
+    ~bunsan_process_inherit_setter()
+    {
+        BOOST_REQUIRE_EQUAL(unsetenv("BUNSAN_PROCESS_INHERIT"), 0);
+    }
+};
+
+BOOST_FIXTURE_TEST_CASE(with_output_inherit, bunsan_process_inherit_setter)
+{
+    BOOST_CHECK_EXCEPTION(
+        bunsan::process::check_sync_execute_with_output(
+            bunsan::process::context().
+            executable("sh").
+            stdin_data("echo \"Hello, world\" && exit 1")
+        ),
+        bunsan::process::check_sync_execute_error,
+        [](const bunsan::process::check_sync_execute_error &e)
+        {
+            const std::string *const output =
+                e.get<bunsan::process::check_sync_execute_error::output>();
+            return !output;
+        }
+    );
 }
 
 BOOST_AUTO_TEST_SUITE_END() // sync_execute
