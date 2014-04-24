@@ -128,6 +128,11 @@ namespace bunsan{namespace process{namespace detail
             BOOST_ASSERT(pid == 0);
             try
             {
+                // clear parent's sigprocmask
+                sigset_t sset;
+                sigemptyset(&sset);
+                sigprocmask(SIG_SETMASK, &sset, nullptr);
+
                 boost::filesystem::current_path(ctx.current_path);
 
                 stdin_visitor.dispatch();
