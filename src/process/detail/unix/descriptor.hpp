@@ -19,7 +19,7 @@ namespace bunsan{namespace process{namespace detail
         descriptor &operator=(const descriptor &)=delete;
         descriptor &operator=(descriptor &&);
 
-        explicit inline operator bool() const { return m_fd; }
+        explicit inline operator bool() const { return static_cast<bool>(m_fd); }
         inline int operator*() const { return *m_fd; }
 
         void reset();

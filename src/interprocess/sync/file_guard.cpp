@@ -55,7 +55,7 @@ namespace bunsan{namespace interprocess
 
     file_guard::operator bool() const noexcept
     {
-        return m_path;
+        return static_cast<bool>(m_path);
     }
 
     void file_guard::swap(file_guard &guard) noexcept
