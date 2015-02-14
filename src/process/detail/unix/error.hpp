@@ -10,7 +10,7 @@ namespace bunsan{namespace process{namespace detail
 {
     struct system_error: bunsan::filesystem::system_error, virtual error
     {
-        using bunsan::system_error::system_error;
+        using bunsan::filesystem::system_error::system_error;
 
         typedef boost::error_info<struct tag_pid, pid_t> pid;
         typedef boost::error_info<struct tag_fd, int> fd;
