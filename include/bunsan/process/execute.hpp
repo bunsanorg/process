@@ -12,38 +12,15 @@
 
 namespace bunsan{namespace process
 {
-    int sync_execute(const context &ctx);
-    int sync_execute(context &&ctx);
-    inline int sync_execute(context &ctx)
-    {
-        return sync_execute(static_cast<const context &>(ctx));
-    }
-
-    // may alter stdout and stderr of context
-    int sync_execute_with_output(const context &ctx, std::string &output);
-    int sync_execute_with_output(context &&ctx, std::string &output);
-    inline int sync_execute_with_output(context &ctx, std::string &output)
-    {
-        return sync_execute_with_output(static_cast<const context &>(ctx), output);
-    }
-
-    void check_sync_execute(const context &ctx);
-    void check_sync_execute(context &&ctx);
-    inline void check_sync_execute(context &ctx)
-    {
-        check_sync_execute(static_cast<const context &>(ctx));
-    }
+    int sync_execute(context ctx);
+    int sync_execute_with_output(context ctx, std::string &output);
+    void check_sync_execute(context ctx);
 
     /*!
      * \note If BUNSAN_PROCESS_INHERIT environment is set
      * function behaves exactly like check_sync_execute().
      */
-    void check_sync_execute_with_output(const context &ctx);
-    void check_sync_execute_with_output(context &&ctx);
-    inline void check_sync_execute_with_output(context &ctx)
-    {
-        check_sync_execute_with_output(static_cast<const context &>(ctx));
-    }
+    void check_sync_execute_with_output(context ctx);
 
     // convenient aliases
 

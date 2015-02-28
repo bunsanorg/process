@@ -5,7 +5,7 @@
 #include <bunsan/process/detail/file_action.hpp>
 #include <bunsan/process/path.hpp>
 
-#include <bunsan/logging/legacy.hpp>
+#include <bunsan/logging/trivial.hpp>
 #include <bunsan/filesystem/fstream.hpp>
 #include <bunsan/tempfile.hpp>
 
@@ -97,15 +97,15 @@ namespace bunsan{namespace process{namespace
     };
 }}}
 
-int bunsan::process::sync_execute(bunsan::process::context &&ctx)
+int bunsan::process::sync_execute(bunsan::process::context ctx)
 {
     try
     {
         ctx.build();
 
-        SLOG("attempt to execute " << ctx.executable() <<
-             " in " << ctx.current_path() <<
-             (ctx.use_path() ? " " : " without") << " using path");
+        BUNSAN_LOG_TRACE << "Attempt to execute " << ctx.executable() <<
+                             " in " << ctx.current_path() <<
+                             (ctx.use_path() ? " " : " without") << " using path";
 
         detail::context ctx_;
 
@@ -126,7 +126,7 @@ int bunsan::process::sync_execute(bunsan::process::context &&ctx)
 
         { // begin logging section
             std::ostringstream sout;
-            sout << "executing " << ctx_.executable << " in " <<
+            sout << "Executing " << ctx_.executable << " in " <<
                     ctx_.current_path << " with arguments = [";
             for (std::size_t i = 0; i < ctx_.arguments.size(); ++i)
             {
@@ -135,7 +135,7 @@ int bunsan::process::sync_execute(bunsan::process::context &&ctx)
                 sout << boost::io::quoted(ctx_.arguments[i]);
             }
             sout << ']';
-            SLOG(sout.str());
+            BUNSAN_LOG_TRACE << sout.str();
         } // end logging section
 
         return detail::sync_execute(ctx_);

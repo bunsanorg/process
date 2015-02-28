@@ -20,9 +20,7 @@ namespace bunsan{namespace process{namespace
         return error;
     }
 
-    void check_sync_execute_with_optional_output(
-        const context &ctx,
-        bool with_output)
+    void check_sync_execute_with_optional_output(context ctx, bool with_output)
     {
         try
         {
@@ -62,19 +60,7 @@ namespace bunsan{namespace process{namespace
     }
 }}}
 
-int bunsan::process::sync_execute(const context &ctx)
-{
-    context ctx_(ctx);
-    return sync_execute(std::move(ctx_));
-}
-
-int bunsan::process::sync_execute_with_output(const context &ctx, std::string &output)
-{
-    context ctx_(ctx);
-    return sync_execute_with_output(std::move(ctx_), output);
-}
-
-int bunsan::process::sync_execute_with_output(context &&ctx, std::string &output)
+int bunsan::process::sync_execute_with_output(context ctx, std::string &output)
 {
     try
     {
@@ -117,24 +103,12 @@ int bunsan::process::sync_execute_with_output(context &&ctx, std::string &output
     }
 }
 
-void bunsan::process::check_sync_execute(const context &ctx)
+void bunsan::process::check_sync_execute(context ctx)
 {
-    context ctx_(ctx);
-    return check_sync_execute(std::move(ctx_));
+    check_sync_execute_with_optional_output(std::move(ctx), false);
 }
 
-void bunsan::process::check_sync_execute(context &&ctx)
+void bunsan::process::check_sync_execute_with_output(context ctx)
 {
-    return check_sync_execute_with_optional_output(std::move(ctx), false);
-}
-
-void bunsan::process::check_sync_execute_with_output(const context &ctx)
-{
-    context ctx_(ctx);
-    check_sync_execute_with_output(std::move(ctx_));
-}
-
-void bunsan::process::check_sync_execute_with_output(context &&ctx)
-{
-    return check_sync_execute_with_optional_output(std::move(ctx), true);
+    check_sync_execute_with_optional_output(std::move(ctx), true);
 }
