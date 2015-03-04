@@ -19,7 +19,7 @@ else()
     message(SEND_ERROR "Platform is not supported")
 endif()
 
-bunsan_add_shared_library(${PROJECT_NAME}
+bunsan_add_library(${PROJECT_NAME}
     src/process/context.cpp
     src/process/error.cpp
     src/process/execute.cpp
