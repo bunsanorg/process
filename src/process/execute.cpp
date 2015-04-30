@@ -48,7 +48,7 @@ namespace bunsan{namespace process{namespace
     {
         using forward_file_action_visitor::operator();
 
-        detail::file_action operator()(boost::none_t)
+        detail::file_action operator()(do_default_type)
         {
             return suppress;
         }
@@ -74,7 +74,7 @@ namespace bunsan{namespace process{namespace
     {
         using forward_file_action_visitor::operator();
 
-        detail::file_action operator()(boost::none_t)
+        detail::file_action operator()(do_default_type)
         {
             return inherit;
         }
@@ -85,7 +85,7 @@ namespace bunsan{namespace process{namespace
     {
         using forward_file_action_visitor::operator();
 
-        detail::file_action operator()(boost::none_t)
+        detail::file_action operator()(do_default_type)
         {
             return inherit;
         }

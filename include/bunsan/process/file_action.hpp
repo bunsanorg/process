@@ -8,12 +8,13 @@
 
 namespace bunsan{namespace process
 {
+    enum do_default_type { do_default };
     enum inherit_type { inherit };
     enum suppress_type { suppress };
     enum redirect_to_stdout_type { redirect_to_stdout };
 
     typedef boost::variant<
-        boost::none_t,
+        do_default_type,
         inherit_type,
         suppress_type,
         std::string,
@@ -21,14 +22,14 @@ namespace bunsan{namespace process
     > stdin_data_type;
 
     typedef boost::variant<
-        boost::none_t,
+        do_default_type,
         inherit_type,
         suppress_type,
         boost::filesystem::path
     > stdout_data_type;
 
     typedef boost::variant<
-        boost::none_t,
+        do_default_type,
         inherit_type,
         suppress_type,
         redirect_to_stdout_type,

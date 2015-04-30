@@ -57,9 +57,9 @@ namespace bunsan{namespace process
             m_executable.reset();
             m_arguments.clear();
             m_use_path.reset();
-            m_stdin_data = boost::none;
-            m_stdout_data = boost::none;
-            m_stderr_data = boost::none;
+            m_stdin_data = do_default;
+            m_stdout_data = do_default;
+            m_stderr_data = do_default;
         }
 
         inline void swap(context &ctx) noexcept
@@ -304,9 +304,9 @@ namespace bunsan{namespace process
         boost::optional<boost::filesystem::path> m_executable;
         std::vector<std::string> m_arguments;
         boost::optional<bool> m_use_path;
-        stdin_data_type m_stdin_data = boost::none;
-        stdout_data_type m_stdout_data = boost::none;
-        stderr_data_type m_stderr_data = boost::none;
+        stdin_data_type m_stdin_data = do_default;
+        stdout_data_type m_stdout_data = do_default;
+        stderr_data_type m_stderr_data = do_default;
     };
     inline void swap(context &a, context &b) noexcept
     {
