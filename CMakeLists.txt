@@ -23,6 +23,8 @@ bunsan_add_library(${PROJECT_NAME}
     src/process/context.cpp
     src/process/error.cpp
     src/process/execute.cpp
+    src/process/executor.cpp
+    src/process/native_executor.cpp
     src/process/aliases.cpp
     src/process/path.cpp
 
