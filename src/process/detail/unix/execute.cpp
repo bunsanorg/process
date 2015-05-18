@@ -82,8 +82,10 @@ namespace bunsan{namespace process{namespace detail
         executor exec_(ctx.executable, ctx.arguments);
 
         file_action_visitor stdin_visitor(stdin_file, O_RDONLY);
-        file_action_visitor stdout_visitor(stdout_file, O_WRONLY | O_CREAT | O_TRUNC);
-        file_action_visitor stderr_visitor(stderr_file, O_WRONLY | O_CREAT | O_TRUNC);
+        file_action_visitor stdout_visitor(stdout_file,
+                                           O_WRONLY | O_CREAT | O_TRUNC);
+        file_action_visitor stderr_visitor(stderr_file,
+                                           O_WRONLY | O_CREAT | O_TRUNC);
         boost::apply_visitor(stdin_visitor, ctx.stdin_file);
         boost::apply_visitor(stdout_visitor, ctx.stdout_file);
         boost::apply_visitor(stderr_visitor, ctx.stderr_file);

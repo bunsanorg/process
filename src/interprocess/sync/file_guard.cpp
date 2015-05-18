@@ -9,7 +9,8 @@
 
 namespace bunsan{namespace interprocess
 {
-    file_guard::file_guard(const boost::filesystem::path &path): m_path(path)
+    file_guard::file_guard(const boost::filesystem::path &path):
+        m_path(path)
     {
         try
         {
@@ -20,13 +21,15 @@ namespace bunsan{namespace interprocess
             }
             else if (errno == EEXIST)
             {
-                BOOST_THROW_EXCEPTION(file_guard_locked_error() <<
-                                      file_guard_locked_error::lock_path(path));
+                BOOST_THROW_EXCEPTION(
+                    file_guard_locked_error() <<
+                    file_guard_locked_error::lock_path(path));
             }
             else
             {
-                BOOST_THROW_EXCEPTION(filesystem::system_error("open") <<
-                                      filesystem::system_error::path(path));
+                BOOST_THROW_EXCEPTION(
+                    filesystem::system_error("open") <<
+                    filesystem::system_error::path(path));
             }
         }
         catch (file_guard_locked_error &)
@@ -35,8 +38,9 @@ namespace bunsan{namespace interprocess
         }
         catch (std::exception &)
         {
-            BOOST_THROW_EXCEPTION(file_guard_create_error() <<
-                                  enable_nested_current());
+            BOOST_THROW_EXCEPTION(
+                file_guard_create_error() <<
+                enable_nested_current());
         }
     }
 
@@ -74,8 +78,9 @@ namespace bunsan{namespace interprocess
         }
         catch (std::exception &)
         {
-            BOOST_THROW_EXCEPTION(file_guard_remove_error() <<
-                                  enable_nested_current());
+            BOOST_THROW_EXCEPTION(
+                file_guard_remove_error() <<
+                enable_nested_current());
         }
     }
 

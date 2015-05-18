@@ -26,7 +26,8 @@ namespace bunsan{namespace process{namespace
         {
             if (with_output)
             {
-                const char *const inherit = std::getenv("BUNSAN_PROCESS_INHERIT");
+                const char *const inherit =
+                    std::getenv("BUNSAN_PROCESS_INHERIT");
                 if (inherit)
                     with_output = false;
             }

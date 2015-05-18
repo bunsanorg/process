@@ -11,5 +11,6 @@
 namespace bunsan{namespace process{namespace detail
 {
     descriptor open(const boost::filesystem::path &path, const int flags);
-    descriptor open(const boost::filesystem::path &path, const int flags, const mode_t mode);
+    descriptor open(const boost::filesystem::path &path,
+                    const int flags, const mode_t mode);
 }}}

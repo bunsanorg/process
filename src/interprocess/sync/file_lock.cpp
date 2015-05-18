@@ -13,13 +13,15 @@ file_lock_factory &file_lock_factory::instance()
     return global_file_lock_factory;
 }
 
-const boost::filesystem::path &file_lock_factory::get_path_from_pointer(const mutex_ptr &mtx)
+const boost::filesystem::path &file_lock_factory::get_path_from_pointer(
+    const mutex_ptr &mtx)
 {
     BOOST_ASSERT(mtx);
     return mtx->path;
 }
 
-file_lock_factory::mutex_ptr file_lock_factory::try_find_mutex(const boost::filesystem::path &path)
+file_lock_factory::mutex_ptr file_lock_factory::try_find_mutex(
+    const boost::filesystem::path &path)
 {
     index_path_type &by_path = m_instances.get<tag_path>();
     index_path_type::iterator it = by_path.find(path);
@@ -78,12 +80,14 @@ file_lock::file_lock():
     m_factory(0)
 {}
 
-file_lock::file_lock(const boost::filesystem::path &path, file_lock_factory &factory_)
+file_lock::file_lock(const boost::filesystem::path &path,
+                     file_lock_factory &factory_)
 {
     *this = factory_.get(path);
 }
 
-file_lock::file_lock(file_lock_factory &factory_, const mutex_ptr &mutex_):
+file_lock::file_lock(file_lock_factory &factory_,
+                     const mutex_ptr &mutex_):
     m_factory(&factory_),
     m_mutex(mutex_)
 {}
@@ -116,7 +120,8 @@ void file_lock::reset() noexcept
 
 file_lock::operator bool() const noexcept
 {
-    BOOST_ASSERT(static_cast<bool>(m_factory) == static_cast<bool>(m_mutex));
+    BOOST_ASSERT(static_cast<bool>(m_factory)
+                 == static_cast<bool>(m_mutex));
     return static_cast<bool>(m_factory);
 }
 

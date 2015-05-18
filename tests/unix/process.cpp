@@ -141,7 +141,8 @@ BOOST_AUTO_TEST_CASE(stderr_file)
     );
 }
 
-BOOST_FIXTURE_TEST_CASE(std_out_err_file, bunsan::testing::filesystem::tempfiles)
+BOOST_FIXTURE_TEST_CASE(std_out_err_file,
+                        bunsan::testing::filesystem::tempfiles)
 {
     const auto path_out = allocate(), path_err = allocate();
     BOOST_CHECK_EQUAL(

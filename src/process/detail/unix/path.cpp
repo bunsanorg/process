@@ -36,7 +36,8 @@ namespace bunsan{namespace process{namespace detail
 
         for (const boost::filesystem::path dir: path_dirs)
         {
-            const boost::filesystem::path abs_path = boost::filesystem::absolute(dir / executable);
+            const boost::filesystem::path abs_path =
+                boost::filesystem::absolute(dir / executable);
             if (boost::filesystem::exists(abs_path))
                 return abs_path;
         }

@@ -12,7 +12,8 @@ struct file_guard_fixture
     const boost::filesystem::path lock_path;
 
     file_guard_fixture():
-        lock_path(boost::filesystem::temp_directory_path() / boost::filesystem::unique_path())
+        lock_path(boost::filesystem::temp_directory_path() /
+                  boost::filesystem::unique_path())
     {
         BOOST_REQUIRE(!boost::filesystem::exists(lock_path));
     }
@@ -49,7 +50,8 @@ BOOST_AUTO_TEST_CASE(collision)
 {
     file_guard fg(lock_path);
     BOOST_CHECK(fg);
-    BOOST_CHECK_THROW(file_guard new_fg(lock_path), bunsan::interprocess::file_guard_locked_error);
+    BOOST_CHECK_THROW(file_guard new_fg(lock_path),
+                      bunsan::interprocess::file_guard_locked_error);
     fg.remove();
     BOOST_CHECK(!fg);
     file_guard new_fg(lock_path);
@@ -59,7 +61,8 @@ BOOST_AUTO_TEST_CASE(collision)
 BOOST_AUTO_TEST_CASE(directory_lock)
 {
     BOOST_REQUIRE(boost::filesystem::create_directory(lock_path));
-    BOOST_CHECK_THROW(file_guard fg(lock_path), bunsan::interprocess::file_guard_locked_error);
+    BOOST_CHECK_THROW(file_guard fg(lock_path),
+                      bunsan::interprocess::file_guard_locked_error);
     BOOST_REQUIRE(boost::filesystem::remove(lock_path));
 }
 
@@ -77,13 +80,15 @@ BOOST_AUTO_TEST_CASE(permission_denied)
         boost::filesystem::others_exe;
     boost::filesystem::permissions(tmpdir.path, all_read | all_exe);
     const boost::filesystem::path &no_perm_dir = tmpdir.path;
-    const boost::filesystem::path no_perm_file = no_perm_dir / boost::filesystem::unique_path();
+    const boost::filesystem::path no_perm_file =
+        no_perm_dir / boost::filesystem::unique_path();
     BOOST_REQUIRE(boost::filesystem::exists(no_perm_dir));
     BOOST_REQUIRE(!boost::filesystem::exists(no_perm_file));
     const auto check_system_error =
         [&](const bunsan::filesystem::system_error &e)
         {
-            const boost::filesystem::path *const path = e.get<bunsan::filesystem::system_error::path>();
+            const boost::filesystem::path *const path =
+                e.get<bunsan::filesystem::system_error::path>();
             return path && *path == no_perm_file;
         };
     const auto check_create_error =

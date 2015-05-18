@@ -51,7 +51,14 @@ BOOST_AUTO_TEST_CASE(arguments)
         typedef std::vector<os> vos;
         const vs _23 = {"second", "third"};
         const vos _56 = {os("fifth"), os(), os("sixth"), os()};
-        const vs result = {"first", "second", "third", "fourth", "fifth", "sixth"};
+        const vs result = {
+            "first",
+            "second",
+            "third",
+            "fourth",
+            "fifth",
+            "sixth"
+        };
         ctx.arguments("first", _23, os("fourth"), os(), _56);
         BOOST_CHECK(ctx.arguments() == result);
     }
