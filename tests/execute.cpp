@@ -39,4 +39,13 @@ BOOST_AUTO_TEST_CASE(sync_execute)
     bp::sync_execute("hello", "world");
 }
 
+BOOST_AUTO_TEST_CASE(check_sync_execute)
+{
+    MOCK_EXPECT(executor->sync_execute).once().with(mock::any).returns(0);
+    MOCK_EXPECT(executor->sync_execute).once().with(mock::any).returns(1);
+    BOOST_CHECK_NO_THROW(bp::check_sync_execute("hello"));
+    BOOST_CHECK_THROW(bp::check_sync_execute("hello"),
+                      bp::non_zero_exit_status_error);
+}
+
 BOOST_AUTO_TEST_SUITE_END() // execute
