@@ -6,6 +6,6 @@ namespace bunsan{namespace process
 {
     MOCK_BASE_CLASS(mock_executor, executor)
     {
-        MOCK_METHOD(sync_execute, 1, int (const context &ctx))
+        MOCK_METHOD(sync_execute, 1, int (context ctx))
     };
 }}

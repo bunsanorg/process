@@ -7,8 +7,7 @@ int bunsan::process::sync_execute(bunsan::process::context ctx)
 {
     try
     {
-        ctx.build();
-        return executor::instance()->sync_execute(ctx);
+        return executor::instance()->sync_execute(std::move(ctx));
     }
     catch (std::exception &)
     {

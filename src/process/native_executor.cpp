@@ -97,7 +97,13 @@ namespace bunsan{namespace process{namespace
 
 namespace bunsan{namespace process
 {
-    int native_executor::sync_execute(const context &ctx)
+    int native_executor::sync_execute(context ctx)
+    {
+        ctx.build();
+        return sync_execute_impl(ctx);
+    }
+
+    int native_executor::sync_execute_impl(const context &ctx)
     {
         BUNSAN_LOG_TRACE << "Attempt to execute " << ctx.executable() <<
                              " in " << ctx.current_path() <<

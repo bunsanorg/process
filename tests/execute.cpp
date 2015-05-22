@@ -29,11 +29,9 @@ BOOST_AUTO_TEST_CASE(sync_execute)
 {
     MOCK_EXPECT(executor->sync_execute).once().with(
         [](const bp::context &ctx) {
-            BOOST_CHECK_EQUAL(ctx.executable(), "hello");
             BOOST_REQUIRE_EQUAL(ctx.arguments().size(), 2);
             BOOST_CHECK_EQUAL(ctx.arguments()[0], "hello");
             BOOST_CHECK_EQUAL(ctx.arguments()[1], "world");
-            BOOST_CHECK(ctx.use_path());
             return true;
         }).returns(0);
     bp::sync_execute("hello", "world");

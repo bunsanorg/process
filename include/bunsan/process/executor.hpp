@@ -13,7 +13,7 @@ namespace bunsan{namespace process
 
         virtual ~executor();
 
-        virtual int sync_execute(const context &ctx)=0;
+        virtual int sync_execute(context ctx)=0;
 
         static void register_native();
         static void register_instance(std::shared_ptr<executor> impl);

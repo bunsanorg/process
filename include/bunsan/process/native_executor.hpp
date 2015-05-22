@@ -7,6 +7,9 @@ namespace bunsan{namespace process
     public:
         native_executor()=default;
 
-        int sync_execute(const context &ctx) override;
+        int sync_execute(context ctx) override;
+
+    private:
+        int sync_execute_impl(const context &ctx);
     };
 }}
