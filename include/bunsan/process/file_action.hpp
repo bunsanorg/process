@@ -3,7 +3,6 @@
 #include <string>
 
 #include <boost/filesystem/path.hpp>
-#include <boost/none.hpp>
 #include <boost/variant.hpp>
 
 namespace bunsan{namespace process
