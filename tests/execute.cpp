@@ -10,23 +10,7 @@
 
 namespace bp = bunsan::process;
 
-struct execute_fixture
-{
-    execute_fixture():
-        executor(std::make_shared<bp::mock_executor>())
-    {
-        bp::executor::register_instance(executor);
-    }
-
-    ~execute_fixture()
-    {
-        bp::executor::register_native();
-    }
-
-    std::shared_ptr<bp::mock_executor> executor;
-};
-
-BOOST_FIXTURE_TEST_SUITE(execute, execute_fixture)
+BOOST_FIXTURE_TEST_SUITE(execute, bp::mock_executor_fixture)
 
 BOOST_AUTO_TEST_CASE(sync_execute)
 {

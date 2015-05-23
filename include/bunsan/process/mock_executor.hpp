@@ -8,4 +8,25 @@ namespace bunsan{namespace process
     {
         MOCK_METHOD(sync_execute, 1, int (context ctx))
     };
+
+    class mock_executor_fixture
+    {
+    public:
+        mock_executor_fixture():
+            executor(std::make_shared<mock_executor>()),
+            m_previous_executor(executor::instance())
+        {
+            executor::register_instance(executor);
+        }
+
+        ~mock_executor_fixture()
+        {
+            executor::register_instance(m_previous_executor);
+        }
+
+        std::shared_ptr<mock_executor> executor;
+
+    private:
+        executor_ptr m_previous_executor;
+    };
 }}
