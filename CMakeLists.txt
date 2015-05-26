@@ -4,7 +4,11 @@ include(${CMAKE_SOURCE_DIR}/system-config.cmake OPTIONAL)
 
 project(bunsan_process)
 
-find_package(BunsanCMake CONFIG REQUIRED)
+if(BunsanCMakeBuiltin)
+    BunsanCMakeLoad()
+else()
+    find_package(BunsanCMake CONFIG REQUIRED)
+endif()
 
 if(UNIX)
     set(platform_tests unix)
