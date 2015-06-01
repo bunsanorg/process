@@ -19,15 +19,15 @@ namespace bunsan{namespace process{namespace detail
         descriptor &operator=(const descriptor &)=delete;
         descriptor &operator=(descriptor &&);
 
-        explicit inline operator bool() const { return static_cast<bool>(m_fd); }
-        inline int operator*() const { return *m_fd; }
+        explicit operator bool() const { return static_cast<bool>(m_fd); }
+        int operator*() const { return *m_fd; }
 
         void reset();
         void reset(const int fd);
         void close();
         void close_no_except() noexcept;
 
-        inline void swap(descriptor &o) noexcept
+        void swap(descriptor &o) noexcept
         {
             using std::swap;
 

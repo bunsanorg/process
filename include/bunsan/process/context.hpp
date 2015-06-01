@@ -20,27 +20,27 @@ namespace bunsan{namespace process
         context()=default;
         context(const context &)=default;
 
-        inline context(context &&ctx) noexcept
+        context(context &&ctx) noexcept
         {
             swap(ctx);
             ctx.reset();
         }
 
-        inline context &operator=(const context &ctx)
+        context &operator=(const context &ctx)
         {
             context ctx_(ctx);
             swap(ctx_);
             return *this;
         }
 
-        inline context &operator=(context &&ctx) noexcept
+        context &operator=(context &&ctx) noexcept
         {
             swap(ctx);
             ctx.reset();
             return *this;
         }
 
-        inline bool operator==(const context &ctx) const
+        bool operator==(const context &ctx) const
         {
             return m_current_path == ctx.m_current_path &&
                    m_executable == ctx.m_executable &&
@@ -62,7 +62,7 @@ namespace bunsan{namespace process
             m_stderr_data = do_default;
         }
 
-        inline void swap(context &ctx) noexcept
+        void swap(context &ctx) noexcept
         {
             using boost::swap;
             swap(m_current_path, ctx.m_current_path);
@@ -75,45 +75,45 @@ namespace bunsan{namespace process
         }
 
         // current path
-        inline context &current_path(const boost::filesystem::path &current_path_)
+        context &current_path(const boost::filesystem::path &current_path_)
         {
             m_current_path = current_path_;
             return *this;
         }
-        inline const boost::filesystem::path &current_path() const
+        const boost::filesystem::path &current_path() const
         {
             return get(m_current_path, "current_path member was not initialized");
         }
 
         // executable
-        inline context &executable(const boost::filesystem::path &executable_)
+        context &executable(const boost::filesystem::path &executable_)
         {
             m_executable = executable_;
             return *this;
         }
-        inline const boost::filesystem::path &executable() const
+        const boost::filesystem::path &executable() const
         {
             return get(m_executable, "executable member was not initialized");
         }
 
         // arguments
-        inline context &arguments(std::vector<std::string> &&arguments_)
+        context &arguments(std::vector<std::string> &&arguments_)
         {
             m_arguments = std::move(arguments_);
             return *this;
         }
-        inline context &arguments(std::vector<std::string> &arguments_)
+        context &arguments(std::vector<std::string> &arguments_)
         {
             m_arguments = arguments_;
             return *this;
         }
-        inline context &arguments(const std::vector<std::string> &arguments_)
+        context &arguments(const std::vector<std::string> &arguments_)
         {
             m_arguments = arguments_;
             return *this;
         }
         template <typename Arg, typename ... Args>
-        inline context &arguments(Arg &&arg, Args &&...args)
+        context &arguments(Arg &&arg, Args &&...args)
         {
             m_arguments.clear();
             arguments_append(std::forward<Arg>(arg), std::forward<Args>(args)...);
@@ -121,155 +121,155 @@ namespace bunsan{namespace process
         }
         // append
         template <typename Arg1, typename Arg2, typename ... Args>
-        inline context &arguments_append(Arg1 &&arg1, Arg2 &&arg2, Args &&...args)
+        context &arguments_append(Arg1 &&arg1, Arg2 &&arg2, Args &&...args)
         {
             arguments_append(std::forward<Arg1>(arg1));
             arguments_append(std::forward<Arg2>(arg2), std::forward<Args>(args)...);
             return *this;
         }
-        inline context &arguments_append(const char *const obj)
+        context &arguments_append(const char *const obj)
         {
             m_arguments.emplace_back(obj);
             return *this;
         }
-        inline context &arguments_append(std::string &&obj)
+        context &arguments_append(std::string &&obj)
         {
             m_arguments.emplace_back(std::move(obj));
             return *this;
         }
-        inline context &arguments_append(const std::string &obj)
+        context &arguments_append(const std::string &obj)
         {
             m_arguments.emplace_back(obj);
             return *this;
         }
-        inline context &arguments_append(boost::filesystem::path &&obj)
+        context &arguments_append(boost::filesystem::path &&obj)
         {
             arguments_append(obj.string());
             return *this;
         }
-        inline context &arguments_append(const boost::filesystem::path &obj)
+        context &arguments_append(const boost::filesystem::path &obj)
         {
             arguments_append(obj.string());
             return *this;
         }
         template <typename T>
-        inline context &arguments_append(boost::optional<T> &&obj)
+        context &arguments_append(boost::optional<T> &&obj)
         {
             if (obj)
                 arguments_append(std::move(obj.get()));
             return *this;
         }
         template <typename T>
-        inline context &arguments_append(const boost::optional<T> &obj)
+        context &arguments_append(const boost::optional<T> &obj)
         {
             if (obj)
                 arguments_append(obj.get());
             return *this;
         }
         template <typename T>
-        inline context &arguments_append(std::vector<T> &&lst)
+        context &arguments_append(std::vector<T> &&lst)
         {
             for (T &obj: lst)
                 arguments_append(std::move(obj));
             return *this;
         }
         template <typename T>
-        inline context &arguments_append(const std::vector<T> &lst)
+        context &arguments_append(const std::vector<T> &lst)
         {
             for (const T &obj: lst)
                 arguments_append(obj);
             return *this;
         }
         // end of append
-        inline const std::vector<std::string> &arguments() const
+        const std::vector<std::string> &arguments() const
         {
             return m_arguments;
         }
-        inline std::vector<std::string> &arguments()
+        std::vector<std::string> &arguments()
         {
             return m_arguments;
         }
 
         // use path
-        inline context &use_path(bool use_path_)
+        context &use_path(bool use_path_)
         {
             m_use_path = use_path_;
             return *this;
         }
-        inline bool use_path() const
+        bool use_path() const
         {
             return get(m_use_path, "use_path member was not initialized");
         }
 
         // stdin data
-        inline context &stdin_inherit()
+        context &stdin_inherit()
         {
             m_stdin_data = inherit;
             return *this;
         }
-        inline context &stdin_suppress()
+        context &stdin_suppress()
         {
             m_stdin_data = suppress;
             return *this;
         }
-        inline context &stdin_data(const std::string &data)
+        context &stdin_data(const std::string &data)
         {
             m_stdin_data = data;
             return *this;
         }
-        inline context &stdin_file(const boost::filesystem::path &path)
+        context &stdin_file(const boost::filesystem::path &path)
         {
             m_stdin_data = path;
             return *this;
         }
-        inline const stdin_data_type &stdin_data() const
+        const stdin_data_type &stdin_data() const
         {
             return m_stdin_data;
         }
 
         // stdout data
-        inline context &stdout_inherit()
+        context &stdout_inherit()
         {
             m_stdout_data = inherit;
             return *this;
         }
-        inline context &stdout_suppress()
+        context &stdout_suppress()
         {
             m_stdout_data = suppress;
             return *this;
         }
-        inline context &stdout_file(const boost::filesystem::path &path)
+        context &stdout_file(const boost::filesystem::path &path)
         {
             m_stdout_data = path;
             return *this;
         }
-        inline const stdout_data_type &stdout_data() const
+        const stdout_data_type &stdout_data() const
         {
             return m_stdout_data;
         }
 
         // stderr data
-        inline context &stderr_inherit()
+        context &stderr_inherit()
         {
             m_stderr_data = inherit;
             return *this;
         }
-        inline context &stderr_suppress()
+        context &stderr_suppress()
         {
             m_stderr_data = suppress;
             return *this;
         }
-        inline context &stderr_redirect_to_stdout()
+        context &stderr_redirect_to_stdout()
         {
             m_stderr_data = redirect_to_stdout;
             return *this;
         }
-        inline context &stderr_file(const boost::filesystem::path &path)
+        context &stderr_file(const boost::filesystem::path &path)
         {
             m_stderr_data = path;
             return *this;
         }
-        inline const stderr_data_type &stderr_data() const
+        const stderr_data_type &stderr_data() const
         {
             return m_stderr_data;
         }
@@ -280,14 +280,14 @@ namespace bunsan{namespace process
          *
          * \post all properties are initialized
          */
-        inline void build()
+        void build()
         {
             context ctx(*this);
             ctx.build_();
             swap(ctx);
         }
 
-        inline context built() const
+        context built() const
         {
             context ctx(*this);
             ctx.build_();
