@@ -5,7 +5,7 @@
 #include <bunsan/process/detail/file_action.hpp>
 #include <bunsan/process/path.hpp>
 
-#include <bunsan/logging/trivial.hpp>
+#include <bunsan/log/trivial.hpp>
 #include <bunsan/filesystem/fstream.hpp>
 #include <bunsan/tempfile.hpp>
 
