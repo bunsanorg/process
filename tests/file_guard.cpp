@@ -3,7 +3,7 @@
 
 #include <bunsan/filesystem/error.hpp>
 #include <bunsan/interprocess/sync/file_guard.hpp>
-#include <bunsan/testing/filesystem/tempdir.hpp>
+#include <bunsan/test/filesystem/tempdir.hpp>
 
 #include <boost/filesystem/operations.hpp>
 
@@ -69,7 +69,7 @@ BOOST_AUTO_TEST_CASE(directory_lock)
 BOOST_AUTO_TEST_CASE(permission_denied)
 {
     // create directory with no write permissions
-    const bunsan::testing::filesystem::tempdir tmpdir;
+    const bunsan::test::filesystem::tempdir tmpdir;
     const boost::filesystem::perms all_read =
         boost::filesystem::owner_read |
         boost::filesystem::group_read |

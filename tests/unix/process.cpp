@@ -1,11 +1,11 @@
 #define BOOST_TEST_MODULE process
 #include <boost/test/unit_test.hpp>
 
-#include <bunsan/testing/exec_test.hpp>
-#include <bunsan/testing/filesystem/read_data.hpp>
-#include <bunsan/testing/filesystem/tempfile.hpp>
-#include <bunsan/testing/filesystem/tempfiles.hpp>
-#include <bunsan/testing/filesystem/write_data.hpp>
+#include <bunsan/test/exec_test.hpp>
+#include <bunsan/test/filesystem/read_data.hpp>
+#include <bunsan/test/filesystem/tempfile.hpp>
+#include <bunsan/test/filesystem/tempfiles.hpp>
+#include <bunsan/test/filesystem/write_data.hpp>
 
 #include <bunsan/process/execute.hpp>
 
@@ -15,7 +15,7 @@ BOOST_AUTO_TEST_SUITE(process)
 
 BOOST_AUTO_TEST_SUITE(unix)
 
-BOOST_FIXTURE_TEST_SUITE(sync_execute, bunsan::testing::filesystem::tempfile)
+BOOST_FIXTURE_TEST_SUITE(sync_execute, bunsan::test::filesystem::tempfile)
 
 BOOST_AUTO_TEST_CASE(exit_status)
 {
@@ -49,7 +49,7 @@ BOOST_AUTO_TEST_CASE(stdin_data)
         11
     );
 
-    bunsan::testing::filesystem::write_data(path, "exit 12");
+    bunsan::test::filesystem::write_data(path, "exit 12");
     BOOST_CHECK_EQUAL(
         bunsan::process::sync_execute(
             bunsan::process::context().
@@ -72,7 +72,7 @@ BOOST_AUTO_TEST_CASE(stdin_data)
 
 BOOST_AUTO_TEST_CASE(stdin_file)
 {
-    bunsan::testing::filesystem::write_data(path, "kill -13 $$");
+    bunsan::test::filesystem::write_data(path, "kill -13 $$");
     BOOST_CHECK_EQUAL(
         bunsan::process::sync_execute(
             bunsan::process::context().
@@ -104,7 +104,7 @@ BOOST_AUTO_TEST_CASE(stdout_file)
         0
     );
     BOOST_CHECK_EQUAL(
-        bunsan::testing::filesystem::read_data(path),
+        bunsan::test::filesystem::read_data(path),
         "Hello, world\n"
     );
 }
@@ -121,7 +121,7 @@ BOOST_AUTO_TEST_CASE(stderr_file)
         0
     );
     BOOST_CHECK_EQUAL(
-        bunsan::testing::filesystem::read_data(path),
+        bunsan::test::filesystem::read_data(path),
         "Hello, world\n"
     );
 
@@ -136,13 +136,13 @@ BOOST_AUTO_TEST_CASE(stderr_file)
         0
     );
     BOOST_CHECK_EQUAL(
-        bunsan::testing::filesystem::read_data(path),
+        bunsan::test::filesystem::read_data(path),
         "Hello, world\n"
     );
 }
 
 BOOST_FIXTURE_TEST_CASE(std_out_err_file,
-                        bunsan::testing::filesystem::tempfiles)
+                        bunsan::test::filesystem::tempfiles)
 {
     const auto path_out = allocate(), path_err = allocate();
     BOOST_CHECK_EQUAL(
@@ -157,11 +157,11 @@ BOOST_FIXTURE_TEST_CASE(std_out_err_file,
         0
     );
     BOOST_CHECK_EQUAL(
-        bunsan::testing::filesystem::read_data(path_out),
+        bunsan::test::filesystem::read_data(path_out),
         "Hello, out world\n"
     );
     BOOST_CHECK_EQUAL(
-        bunsan::testing::filesystem::read_data(path_err),
+        bunsan::test::filesystem::read_data(path_err),
         "Hello, err world\n"
     );
 }

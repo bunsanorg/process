@@ -1,8 +1,8 @@
 #define BOOST_TEST_MODULE execute
 #include <boost/test/unit_test.hpp>
 
-#include <bunsan/testing/filesystem/write_data.hpp>
-#include <bunsan/testing/test_tools.hpp>
+#include <bunsan/test/filesystem/write_data.hpp>
+#include <bunsan/test/test_tools.hpp>
 
 #include <bunsan/process/execute.hpp>
 #include <bunsan/process/executor.hpp>
@@ -47,7 +47,7 @@ BOOST_AUTO_TEST_CASE(sync_execute_with_output)
             const auto out = boost::get<boost::filesystem::path>(&ctx.stdout_data());
             BUNSAN_IF_CHECK(out)
             {
-                bunsan::testing::filesystem::write_data(*out, "some data");
+                bunsan::test::filesystem::write_data(*out, "some data");
             }
             BOOST_CHECK(boost::get<bp::redirect_to_stdout_type>(&ctx.stderr_data()));
             return 10;
