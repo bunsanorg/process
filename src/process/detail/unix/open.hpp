@@ -8,9 +8,13 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
-namespace bunsan{namespace process{namespace detail
-{
-    descriptor open(const boost::filesystem::path &path, const int flags);
-    descriptor open(const boost::filesystem::path &path,
-                    const int flags, const mode_t mode);
-}}}
+namespace bunsan {
+namespace process {
+namespace detail {
+
+descriptor open(const boost::filesystem::path &path, int flags);
+descriptor open(const boost::filesystem::path &path, int flags, mode_t mode);
+
+}  // namespace detail
+}  // namespace process
+}  // namespace bunsan

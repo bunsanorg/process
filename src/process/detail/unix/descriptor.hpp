@@ -2,52 +2,53 @@
 
 #include <boost/optional.hpp>
 
-namespace bunsan{namespace process{namespace detail
-{
-    class descriptor
-    {
-    public:
-        descriptor()=default;
-        ~descriptor();
+namespace bunsan {
+namespace process {
+namespace detail {
 
-        explicit descriptor(const int fd);
-        descriptor(const int fd, const bool close);
+class descriptor {
+ public:
+  descriptor() = default;
+  ~descriptor();
 
-        descriptor(const descriptor &)=delete;
-        descriptor(descriptor &&);
+  explicit descriptor(int fd);
+  descriptor(int fd, bool close);
 
-        descriptor &operator=(const descriptor &)=delete;
-        descriptor &operator=(descriptor &&);
+  descriptor(const descriptor &) = delete;
+  descriptor(descriptor &&);
 
-        explicit operator bool() const { return static_cast<bool>(m_fd); }
-        int operator*() const { return *m_fd; }
+  descriptor &operator=(const descriptor &) = delete;
+  descriptor &operator=(descriptor &&);
 
-        void reset();
-        void reset(const int fd);
-        void close();
-        void close_no_except() noexcept;
+  explicit operator bool() const { return static_cast<bool>(m_fd); }
+  int operator*() const { return *m_fd; }
 
-        void swap(descriptor &o) noexcept
-        {
-            using std::swap;
+  void reset();
+  void reset(const int fd);
+  void close();
+  void close_no_except() noexcept;
 
-            swap(m_fd, o.m_fd);
-            swap(m_close, o.m_close);
-        }
+  void swap(descriptor &o) noexcept {
+    using std::swap;
 
-        descriptor dup() const;
-        descriptor dup2(const int new_fd) const;
+    swap(m_fd, o.m_fd);
+    swap(m_close, o.m_close);
+  }
 
-    private:
-        boost::optional<int> m_fd;
-        bool m_close = true;
-    };
-    inline void swap(descriptor &a, descriptor &b) noexcept
-    {
-        a.swap(b);
-    }
+  descriptor dup() const;
+  descriptor dup2(int new_fd) const;
 
-    descriptor stdin_descriptor();
-    descriptor stdout_descriptor();
-    descriptor stderr_descriptor();
-}}}
+ private:
+  boost::optional<int> m_fd;
+  bool m_close = true;
+};
+
+inline void swap(descriptor &a, descriptor &b) noexcept { a.swap(b); }
+
+descriptor stdin_descriptor();
+descriptor stdout_descriptor();
+descriptor stderr_descriptor();
+
+}  // namespace detail
+}  // namespace process
+}  // namespace bunsan

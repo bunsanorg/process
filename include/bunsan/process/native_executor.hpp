@@ -1,15 +1,17 @@
 #include <bunsan/process/executor.hpp>
 
-namespace bunsan{namespace process
-{
-    class native_executor: public executor
-    {
-    public:
-        native_executor()=default;
+namespace bunsan {
+namespace process {
 
-        int sync_execute(context ctx) override;
+class native_executor : public executor {
+ public:
+  native_executor() = default;
 
-    private:
-        int sync_execute_impl(const context &ctx);
-    };
-}}
+  int sync_execute(context ctx) override;
+
+ private:
+  int sync_execute_impl(const context &ctx);
+};
+
+}  // namespace process
+}  // namespace bunsan

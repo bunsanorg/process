@@ -5,51 +5,52 @@
 #include <boost/filesystem/path.hpp>
 #include <boost/optional.hpp>
 
-namespace bunsan{namespace interprocess
-{
-    struct file_guard_error: virtual bunsan::error
-    {
-        typedef boost::error_info<struct tag_lock_path, boost::filesystem::path> lock_path;
-    };
+namespace bunsan {
+namespace interprocess {
 
-    struct file_guard_create_error: virtual file_guard_error {};
-    struct file_guard_locked_error: virtual file_guard_create_error {};
-    struct file_guard_remove_error: virtual file_guard_error {};
+struct file_guard_error : virtual bunsan::error {
+  using lock_path =
+      boost::error_info<struct tag_lock_path, boost::filesystem::path>;
+};
 
-    class file_guard
-    {
-    public:
-        /// Unlocked guard.
-        file_guard()=default;
+struct file_guard_create_error : virtual file_guard_error {};
+struct file_guard_locked_error : virtual file_guard_create_error {};
+struct file_guard_remove_error : virtual file_guard_error {};
 
-        /*!
-         * \brief Create file at specified path.
-         *
-         * \throw file_guard_locked_error if file exists (type of file does not matter)
-         */
-        explicit file_guard(const boost::filesystem::path &path);
+class file_guard {
+ public:
+  /// Unlocked guard.
+  file_guard() = default;
 
-        // move semantics
-        file_guard(file_guard &&) noexcept;
-        file_guard &operator=(file_guard &&) noexcept;
+  /*!
+   * \brief Create file at specified path.
+   *
+   * \throw file_guard_locked_error if file exists (type of file does not
+   *matter)
+   */
+  explicit file_guard(const boost::filesystem::path &path);
 
-        // no copying
-        file_guard(const file_guard &)=delete;
-        file_guard &operator=(const file_guard &)=delete;
+  // move semantics
+  file_guard(file_guard &&) noexcept;
+  file_guard &operator=(file_guard &&) noexcept;
 
-        explicit operator bool() const noexcept;
+  // no copying
+  file_guard(const file_guard &) = delete;
+  file_guard &operator=(const file_guard &) = delete;
 
-        void swap(file_guard &guard) noexcept;
+  explicit operator bool() const noexcept;
 
-        void remove();
+  void swap(file_guard &guard) noexcept;
 
-        ~file_guard();
+  void remove();
 
-    private:
-        boost::optional<boost::filesystem::path> m_path;
-    };
-    inline void swap(file_guard &a, file_guard &b) noexcept
-    {
-        a.swap(b);
-    }
-}}
+  ~file_guard();
+
+ private:
+  boost::optional<boost::filesystem::path> m_path;
+};
+
+inline void swap(file_guard &a, file_guard &b) noexcept { a.swap(b); }
+
+}  // namespace interprocess
+}  // namespace bunsan
