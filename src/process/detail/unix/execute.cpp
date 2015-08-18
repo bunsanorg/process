@@ -1,9 +1,10 @@
 #include <bunsan/process/detail/execute.hpp>
 
-#include "descriptor.hpp"
 #include "error.hpp"
 #include "executor.hpp"
 #include "open.hpp"
+
+#include <bunsan/process/file/handle.hpp>
 
 #include <boost/assert.hpp>
 #include <boost/filesystem/operations.hpp>
@@ -36,28 +37,28 @@ class file_action_visitor : public boost::static_visitor<void>,
   }
 
   void dispatch() {
-    const descriptor self_fd = standard(m_self);
+    const file::handle self_fd = standard(m_self);
     if (*self_fd != *m_fd) m_fd = m_fd.dup2(*self_fd);
   }
 
  private:
-  static descriptor standard(const standard_file file) {
+  static file::handle standard(const standard_file file) {
     switch (file) {
       case stdin_file:
-        return stdin_descriptor();
+        return file::stdin_handle();
       case stdout_file:
-        return stdout_descriptor();
+        return file::stdout_handle();
       case stderr_file:
-        return stderr_descriptor();
+        return file::stderr_handle();
       default:
-        return descriptor();
+        return file::handle();
     }
   }
 
  private:
   const standard_file m_self;
   const mode_t m_mode;
-  descriptor m_fd;
+  file::handle m_fd;
 };
 
 int sync_execute(const context &ctx) {

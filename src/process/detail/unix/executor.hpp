@@ -1,10 +1,10 @@
 #pragma once
 
-#include <string>
-#include <vector>
-
 #include <boost/filesystem/path.hpp>
 #include <boost/noncopyable.hpp>
+
+#include <string>
+#include <vector>
 
 namespace bunsan {
 namespace process {

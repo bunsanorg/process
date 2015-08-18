@@ -1,6 +1,6 @@
 #pragma once
 
-#include "descriptor.hpp"
+#include <bunsan/process/file/handle.hpp>
 
 #include <boost/filesystem/path.hpp>
 
@@ -12,8 +12,8 @@ namespace bunsan {
 namespace process {
 namespace detail {
 
-descriptor open(const boost::filesystem::path &path, int flags);
-descriptor open(const boost::filesystem::path &path, int flags, mode_t mode);
+file::handle open(const boost::filesystem::path &path, int flags);
+file::handle open(const boost::filesystem::path &path, int flags, mode_t mode);
 
 }  // namespace detail
 }  // namespace process
