@@ -25,6 +25,16 @@ boost::filesystem::path find_executable_in_path(
   /*const*/ std::string path(envpath);
   if (path.empty()) BOOST_THROW_EXCEPTION(empty_environment_path_error());
 
+#if defined(__CYGWIN__)
+  if (!::cygwin_posix_path_list_p(path.c_str()))
+  {
+    const int size = ::cygwin_win32_to_posix_path_list_buf_size(path.c_str());
+    std::vector<char> cygpath(size);
+    ::cygwin_win32_to_posix_path_list(path.c_str(), cygpath.data());
+    path = cygpath.data();
+  }
+#endif
+
   std::vector<std::string> path_dirs;
   boost::algorithm::split(path_dirs, path, boost::algorithm::is_any_of(":"),
                           boost::algorithm::token_compress_on);
