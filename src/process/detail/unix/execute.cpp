@@ -2,7 +2,6 @@
 
 #include "error.hpp"
 #include "executor.hpp"
-#include "open.hpp"
 
 #include <bunsan/process/file/handle.hpp>
 
@@ -23,18 +22,15 @@ namespace detail {
 class file_action_visitor : public boost::static_visitor<void>,
                             private boost::noncopyable {
  public:
-  file_action_visitor(const standard_file self, const mode_t mode)
-      : m_self(self), m_mode(mode) {}
+  using open_t = file::handle (*)(const boost::filesystem::path &path);
+
+  file_action_visitor(const standard_file self, const open_t open)
+      : m_self(self), m_open(open) {}
 
   void operator()(file::inherit_type) { m_fd = standard(m_self); }
-
-  void operator()(file::suppress_type) { m_fd = open("/dev/null", O_RDWR); }
-
+  void operator()(file::suppress_type) { m_fd = file::handle::open_null(); }
   void operator()(const standard_file file) { m_fd = standard(file); }
-
-  void operator()(const boost::filesystem::path &path) {
-    m_fd = open(path, m_mode, 0666);
-  }
+  void operator()(const boost::filesystem::path &path) { m_fd = m_open(path); }
 
   void dispatch() {
     const file::handle self_fd = standard(m_self);
@@ -45,11 +41,11 @@ class file_action_visitor : public boost::static_visitor<void>,
   static file::handle standard(const standard_file file) {
     switch (file) {
       case stdin_file:
-        return file::stdin_handle();
+        return file::handle::std_input();
       case stdout_file:
-        return file::stdout_handle();
+        return file::handle::std_output();
       case stderr_file:
-        return file::stderr_handle();
+        return file::handle::std_error();
       default:
         return file::handle();
     }
@@ -57,16 +53,16 @@ class file_action_visitor : public boost::static_visitor<void>,
 
  private:
   const standard_file m_self;
-  const mode_t m_mode;
+  const open_t m_open;
   file::handle m_fd;
 };
 
 int sync_execute(const context &ctx) {
   executor exec_(ctx.executable, ctx.arguments);
 
-  file_action_visitor stdin_visitor(stdin_file, O_RDONLY);
-  file_action_visitor stdout_visitor(stdout_file, O_WRONLY | O_CREAT | O_TRUNC);
-  file_action_visitor stderr_visitor(stderr_file, O_WRONLY | O_CREAT | O_TRUNC);
+  file_action_visitor stdin_visitor(stdin_file, &file::handle::open_read);
+  file_action_visitor stdout_visitor(stdout_file, &file::handle::open_write);
+  file_action_visitor stderr_visitor(stderr_file, &file::handle::open_write);
   boost::apply_visitor(stdin_visitor, ctx.stdin_file);
   boost::apply_visitor(stdout_visitor, ctx.stdout_file);
   boost::apply_visitor(stderr_visitor, ctx.stderr_file);

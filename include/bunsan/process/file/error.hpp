@@ -10,9 +10,14 @@ namespace process {
 namespace file {
 
 struct error : virtual process::error {
-  using handle = boost::error_info<struct handle, file::handle::implementation>;
+  using handle =
+      boost::error_info<struct tag_handle, file::handle::implementation>;
   using new_handle =
-      boost::error_info<struct new_handle, file::handle::implementation>;
+      boost::error_info<struct tag_new_handle, file::handle::implementation>;
+#if defined(BOOST_POSIX_API)
+  using flags = boost::error_info<struct tag_flags, int>;
+  using mode = boost::error_info<struct tag_mode, mode_t>;
+#endif
 };
 
 struct system_error : bunsan::filesystem::system_error, virtual error {

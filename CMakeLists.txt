@@ -16,7 +16,6 @@ if(UNIX)
         src/process/detail/unix/path.cpp
         src/process/detail/unix/execute.cpp
         src/process/detail/unix/executor.cpp
-        src/process/detail/unix/open.cpp
     )
 else()
     message(SEND_ERROR "Platform is not supported")

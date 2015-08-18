@@ -4,9 +4,12 @@
 #include <boost/config.hpp>
 #include <boost/system/api_config.hpp>
 
+#include <boost/filesystem/path.hpp>
 #include <boost/optional.hpp>
 
-#if defined(BOOST_WINDOWS_API)
+#if defined(BOOST_POSIX_API)
+#include <sys/types.h>
+#elif defined(BOOST_WINDOWS_API)
 #include <windows.h>
 #endif
 
@@ -52,16 +55,22 @@ class handle {
   handle dup() const;
   handle dup2(implementation new_fd) const;
 
+  static handle open_null();  // /dev/null, NUL, ...
+  static handle open_read(const boost::filesystem::path &path);
+  static handle open_write(const boost::filesystem::path &path);
+  static handle open_read_write(const boost::filesystem::path &path);
+  static handle open_append(const boost::filesystem::path &path);
+
+  static handle std_input();
+  static handle std_output();
+  static handle std_error();
+
  private:
   boost::optional<implementation> m_fd;
   bool m_close = true;
 };
 
 inline void swap(handle &a, handle &b) noexcept { a.swap(b); }
-
-handle stdin_handle();
-handle stdout_handle();
-handle stderr_handle();
 
 }  // namespace file
 }  // namespace process
