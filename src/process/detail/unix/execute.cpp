@@ -26,9 +26,9 @@ class file_action_visitor : public boost::static_visitor<void>,
   file_action_visitor(const standard_file self, const mode_t mode)
       : m_self(self), m_mode(mode) {}
 
-  void operator()(inherit_type) { m_fd = standard(m_self); }
+  void operator()(file::inherit_type) { m_fd = standard(m_self); }
 
-  void operator()(suppress_type) { m_fd = open("/dev/null", O_RDWR); }
+  void operator()(file::suppress_type) { m_fd = open("/dev/null", O_RDWR); }
 
   void operator()(const standard_file file) { m_fd = standard(file); }
 

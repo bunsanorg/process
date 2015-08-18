@@ -1,7 +1,7 @@
 #pragma once
 
 #include <bunsan/process/context_forward.hpp>
-#include <bunsan/process/file_action.hpp>
+#include <bunsan/process/file/action.hpp>
 
 #include <bunsan/get.hpp>
 
@@ -50,9 +50,9 @@ class context : public boost::equality_comparable<context> {
     m_executable.reset();
     m_arguments.clear();
     m_use_path.reset();
-    m_stdin_data = do_default;
-    m_stdout_data = do_default;
-    m_stderr_data = do_default;
+    m_stdin_data = file::do_default;
+    m_stdout_data = file::do_default;
+    m_stderr_data = file::do_default;
   }
 
   void swap(context &ctx) noexcept {
@@ -165,11 +165,11 @@ class context : public boost::equality_comparable<context> {
 
   // stdin data
   context &stdin_inherit() {
-    m_stdin_data = inherit;
+    m_stdin_data = file::inherit;
     return *this;
   }
   context &stdin_suppress() {
-    m_stdin_data = suppress;
+    m_stdin_data = file::suppress;
     return *this;
   }
   context &stdin_data(const std::string &data) {
@@ -180,41 +180,41 @@ class context : public boost::equality_comparable<context> {
     m_stdin_data = path;
     return *this;
   }
-  const stdin_data_type &stdin_data() const { return m_stdin_data; }
+  const file::stdin_data_type &stdin_data() const { return m_stdin_data; }
 
   // stdout data
   context &stdout_inherit() {
-    m_stdout_data = inherit;
+    m_stdout_data = file::inherit;
     return *this;
   }
   context &stdout_suppress() {
-    m_stdout_data = suppress;
+    m_stdout_data = file::suppress;
     return *this;
   }
   context &stdout_file(const boost::filesystem::path &path) {
     m_stdout_data = path;
     return *this;
   }
-  const stdout_data_type &stdout_data() const { return m_stdout_data; }
+  const file::stdout_data_type &stdout_data() const { return m_stdout_data; }
 
   // stderr data
   context &stderr_inherit() {
-    m_stderr_data = inherit;
+    m_stderr_data = file::inherit;
     return *this;
   }
   context &stderr_suppress() {
-    m_stderr_data = suppress;
+    m_stderr_data = file::suppress;
     return *this;
   }
   context &stderr_redirect_to_stdout() {
-    m_stderr_data = redirect_to_stdout;
+    m_stderr_data = file::redirect_to_stdout;
     return *this;
   }
   context &stderr_file(const boost::filesystem::path &path) {
     m_stderr_data = path;
     return *this;
   }
-  const stderr_data_type &stderr_data() const { return m_stderr_data; }
+  const file::stderr_data_type &stderr_data() const { return m_stderr_data; }
 
   // build functions
   /*!
@@ -243,9 +243,9 @@ class context : public boost::equality_comparable<context> {
   boost::optional<boost::filesystem::path> m_executable;
   std::vector<std::string> m_arguments;
   boost::optional<bool> m_use_path;
-  stdin_data_type m_stdin_data = do_default;
-  stdout_data_type m_stdout_data = do_default;
-  stderr_data_type m_stderr_data = do_default;
+  file::stdin_data_type m_stdin_data = file::do_default;
+  file::stdout_data_type m_stdout_data = file::do_default;
+  file::stderr_data_type m_stderr_data = file::do_default;
 };
 
 inline void swap(context &a, context &b) noexcept { a.swap(b); }

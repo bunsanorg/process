@@ -22,10 +22,8 @@ namespace process {
 namespace {
 struct forward_file_action_visitor : boost::static_visitor<detail::file_action>,
                                      private boost::noncopyable {
-  detail::file_action operator()(const inherit_type &) { return inherit; }
-
-  detail::file_action operator()(const suppress_type &) { return suppress; }
-
+  detail::file_action operator()(file::inherit_type) { return file::inherit; }
+  detail::file_action operator()(file::suppress_type) { return file::suppress; }
   detail::file_action operator()(const boost::filesystem::path &path) {
     return path;
   }
@@ -33,34 +31,33 @@ struct forward_file_action_visitor : boost::static_visitor<detail::file_action>,
 
 struct stdin_file_action_visitor : forward_file_action_visitor {
   using forward_file_action_visitor::operator();
-
-  detail::file_action operator()(do_default_type) { return suppress; }
-
+  detail::file_action operator()(file::do_default_type) {
+    return file::suppress;
+  }
   detail::file_action operator()(const std::string &data) {
     stdin_tmp = tempfile::regular_file_in_tempdir();
     bunsan::filesystem::ofstream fout(stdin_tmp.path());
-    BUNSAN_FILESYSTEM_FSTREAM_WRAP_BEGIN(fout) {
-      fout << data;
-    } BUNSAN_FILESYSTEM_FSTREAM_WRAP_END(fout)
+    BUNSAN_FILESYSTEM_FSTREAM_WRAP_BEGIN(fout) { fout << data; }
+    BUNSAN_FILESYSTEM_FSTREAM_WRAP_END(fout)
     fout.close();
     return stdin_tmp.path();
   }
-
   tempfile stdin_tmp;
 };
 
 struct stdout_file_action_visitor : forward_file_action_visitor {
   using forward_file_action_visitor::operator();
-
-  detail::file_action operator()(do_default_type) { return inherit; }
+  detail::file_action operator()(file::do_default_type) {
+    return file::inherit;
+  }
 };
 
 struct stderr_file_action_visitor : forward_file_action_visitor {
   using forward_file_action_visitor::operator();
-
-  detail::file_action operator()(do_default_type) { return inherit; }
-
-  detail::file_action operator()(redirect_to_stdout_type) {
+  detail::file_action operator()(file::do_default_type) {
+    return file::inherit;
+  }
+  detail::file_action operator()(file::redirect_to_stdout_type) {
     return detail::stdout_file;
   }
 };
@@ -78,10 +75,11 @@ int native_executor::sync_execute_impl(const context &ctx) {
 
   detail::context ctx_;
 
-  if (ctx.use_path())
+  if (ctx.use_path()) {
     ctx_.executable = find_executable_in_path(ctx.executable());
-  else
+  } else {
     ctx_.executable = ctx.executable();
+  }
 
   ctx_.current_path = ctx.current_path();
   ctx_.arguments = ctx.arguments();

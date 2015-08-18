@@ -48,7 +48,7 @@ BOOST_AUTO_TEST_CASE(sync_execute_with_output) {
           bunsan::test::filesystem::write_data(*out, "some data");
         }
         BOOST_CHECK(
-            boost::get<bp::redirect_to_stdout_type>(&ctx.stderr_data()));
+            boost::get<bp::file::redirect_to_stdout_type>(&ctx.stderr_data()));
         return 10;
       });
   std::string output;
