@@ -37,8 +37,9 @@ struct stdin_file_action_visitor : forward_file_action_visitor {
   detail::file_action operator()(const std::string &data) {
     stdin_tmp = tempfile::regular_file_in_tempdir();
     bunsan::filesystem::ofstream fout(stdin_tmp.path());
-    BUNSAN_FILESYSTEM_FSTREAM_WRAP_BEGIN(fout) { fout << data; }
-    BUNSAN_FILESYSTEM_FSTREAM_WRAP_END(fout)
+    BUNSAN_FILESYSTEM_FSTREAM_WRAP_BEGIN(fout) {
+      fout << data;
+    } BUNSAN_FILESYSTEM_FSTREAM_WRAP_END(fout)
     fout.close();
     return stdin_tmp.path();
   }
