@@ -17,6 +17,8 @@ if(UNIX)
         src/process/detail/unix/execute.cpp
         src/process/detail/unix/executor.cpp
     )
+elseif(WIN32)
+    set(platform_tests win32)
 else()
     message(SEND_ERROR "Platform is not supported")
 endif()
