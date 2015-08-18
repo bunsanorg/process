@@ -19,6 +19,9 @@ if(UNIX)
     )
 elseif(WIN32)
     set(platform_tests win32)
+    set(platform_sources
+        src/process/detail/win32/path.cpp
+    )
 else()
     message(SEND_ERROR "Platform is not supported")
 endif()
