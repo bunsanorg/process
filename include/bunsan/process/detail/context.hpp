@@ -1,6 +1,6 @@
 #pragma once
 
-#include <bunsan/process/detail/file_action.hpp>
+#include <bunsan/process/file/handle.hpp>
 
 #include <boost/filesystem/path.hpp>
 #include <boost/optional.hpp>
@@ -16,7 +16,7 @@ struct context {
   boost::filesystem::path executable;
   boost::filesystem::path current_path;
   std::vector<std::string> arguments;
-  file_action stdin_file, stdout_file, stderr_file;
+  file::handle stdin_file, stdout_file, stderr_file;
 };
 
 }  // namespace detail

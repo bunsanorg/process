@@ -11,7 +11,7 @@ namespace detail {
  * negative value if program was not able to exit,
  * for UNIX-like it is guaranteed to be -termsig.
  */
-int sync_execute(const context &ctx);
+int sync_execute(context ctx);
 
 }  // namespace detail
 }  // namespace process
