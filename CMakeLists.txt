@@ -16,7 +16,6 @@ if(UNIX)
         src/process/detail/unix/path.cpp
         src/process/detail/unix/execute.cpp
         src/process/detail/unix/executor.cpp
-        src/process/detail/unix/descriptor.cpp
         src/process/detail/unix/open.cpp
     )
 else()
@@ -31,6 +30,8 @@ bunsan_add_library(${PROJECT_NAME}
     src/process/native_executor.cpp
     src/process/aliases.cpp
     src/process/path.cpp
+
+    src/process/detail/descriptor.cpp
 
     ${platform_sources}
 

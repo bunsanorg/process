@@ -1,4 +1,4 @@
-#include "descriptor.hpp"
+#include <bunsan/process/detail/descriptor.hpp>
 
 #include "error.hpp"
 
@@ -14,9 +14,9 @@ descriptor::~descriptor() {
   if (m_close) close_no_except();
 }
 
-descriptor::descriptor(const int fd) : m_fd(fd) {}
+descriptor::descriptor(const handle fd) : m_fd(fd) {}
 
-descriptor::descriptor(const int fd, const bool close)
+descriptor::descriptor(const handle fd, const bool close)
     : m_fd(fd), m_close(close) {}
 
 descriptor::descriptor(descriptor &&o) {
@@ -32,7 +32,7 @@ descriptor &descriptor::operator=(descriptor &&o) {
 
 void descriptor::reset() { descriptor().swap(*this); }
 
-void descriptor::reset(const int fd) { descriptor(fd).swap(*this); }
+void descriptor::reset(const handle fd) { descriptor(fd).swap(*this); }
 
 void descriptor::close() {
   if (m_fd) {
@@ -53,16 +53,16 @@ void descriptor::close_no_except() noexcept {
 descriptor descriptor::dup() const {
   if (!*this) BOOST_THROW_EXCEPTION(descriptor_is_closed_error());
   BOOST_ASSERT(m_fd);
-  const int fd = ::dup(*m_fd);
+  const handle fd = ::dup(*m_fd);
   if (fd < 0)
     BOOST_THROW_EXCEPTION(system_error("dup") << system_error::fd(*m_fd));
   return descriptor(fd);
 }
 
-descriptor descriptor::dup2(const int new_fd) const {
+descriptor descriptor::dup2(const handle new_fd) const {
   if (!*this) BOOST_THROW_EXCEPTION(descriptor_is_closed_error());
   BOOST_ASSERT(m_fd);
-  const int fd = ::dup2(*m_fd, new_fd);
+  const handle fd = ::dup2(*m_fd, new_fd);
   if (fd < 0)
     BOOST_THROW_EXCEPTION(system_error("dup2") << system_error::fd(*m_fd)
                                                << system_error::new_fd(new_fd));

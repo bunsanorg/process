@@ -1,6 +1,12 @@
 #pragma once
 
+#include <boost/config.hpp>  // first include
+
 #include <boost/optional.hpp>
+
+#if defined(BOOST_WINDOWS_API)
+#include <windows.h>
+#endif
 
 namespace bunsan {
 namespace process {
@@ -8,11 +14,17 @@ namespace detail {
 
 class descriptor {
  public:
+#if defined(BOOST_POSIX_API)
+  using handle = int;
+#elif defined(BOOST_WINDOWS_API)
+  using handle = HANDLE;
+#endif
+
   descriptor() = default;
   ~descriptor();
 
-  explicit descriptor(int fd);
-  descriptor(int fd, bool close);
+  explicit descriptor(handle fd);
+  descriptor(handle fd, bool close);
 
   descriptor(const descriptor &) = delete;
   descriptor(descriptor &&);
@@ -21,10 +33,10 @@ class descriptor {
   descriptor &operator=(descriptor &&);
 
   explicit operator bool() const { return static_cast<bool>(m_fd); }
-  int operator*() const { return *m_fd; }
+  handle operator*() const { return *m_fd; }
 
   void reset();
-  void reset(const int fd);
+  void reset(const handle fd);
   void close();
   void close_no_except() noexcept;
 
@@ -36,10 +48,10 @@ class descriptor {
   }
 
   descriptor dup() const;
-  descriptor dup2(int new_fd) const;
+  descriptor dup2(handle new_fd) const;
 
  private:
-  boost::optional<int> m_fd;
+  boost::optional<handle> m_fd;
   bool m_close = true;
 };
 
