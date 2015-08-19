@@ -129,7 +129,7 @@ void handle::set_inheritable(const bool inheritable) {
                           << system_error::handle(**this));
 #elif defined(BOOST_WINDOWS_API)
   if (!::SetHandleInformation(**this, HANDLE_FLAG_INHERIT,
-                              i ? HANDLE_FLAG_INHERIT : 0)) {
+                              inheritable ? HANDLE_FLAG_INHERIT : 0)) {
     BOOST_THROW_EXCEPTION(system_error("SetHandleInformation")
                           << system_error::handle(**this));
   }
