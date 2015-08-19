@@ -159,8 +159,16 @@ handle sys_open(const boost::filesystem::path &path, const int flags,
 }
 #elif defined(BOOST_WINDOWS_API)
 template <typename... Args>
-handle sys_open(const boost::filesystem::path &path, Args &&... args) {
-  // TODO
+handle sys_open(const boost::filesystem::path &path, const DWORD access,
+                const DWORD share_mode, SECURITY_ATTRIBUTES *const sec,
+                const DWORD creation, const DWORD flags,
+                const handle::implementation templ) {
+  const handle::implementation fd = ::CreateFile(
+      path.c_str(), access, share_mode, sec, creation, flags, templ);
+  if (fd == INVALID_HANDLE_VALUE)
+    BOOST_THROW_EXCEPTION(system_error("CreateFile")
+                          << system_error::path(path));
+  return handle(fd);
 }
 #endif
 }  // namespace
@@ -169,7 +177,7 @@ handle handle::open_null() {
 #if defined(BOOST_POSIX_API)
   return open_read_write("/dev/null");
 #elif defined(BOOST_WINDOWS_API)
-  return sys_open("NUL", GENERIC_READ, 0, NULL, OPEN_EXISTING, 0, 0);
+  return open_read("NUL");
 #else
 #error Unknown platform
 #endif
@@ -179,7 +187,7 @@ handle handle::open_read(const boost::filesystem::path &path) {
 #if defined(BOOST_POSIX_API)
   return sys_open(path, O_RDONLY | O_CLOEXEC);
 #elif defined(BOOST_WINDOWS_API)
-  // TODO
+  return sys_open(path, GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
 #else
 #error Unknown platform
 #endif
@@ -189,7 +197,7 @@ handle handle::open_write(const boost::filesystem::path &path) {
 #if defined(BOOST_POSIX_API)
   return sys_open(path, O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC, 0666);
 #elif defined(BOOST_WINDOWS_API)
-  // TODO
+  return sys_open(path, GENERIC_WRITE, 0, nullptr, OPEN_ALWAYS, 0, nullptr);
 #else
 #error Unknown platform
 #endif
@@ -199,7 +207,8 @@ handle handle::open_read_write(const boost::filesystem::path &path) {
 #if defined(BOOST_POSIX_API)
   return sys_open(path, O_RDWR | O_CREAT | O_CLOEXEC, 0666);
 #elif defined(BOOST_WINDOWS_API)
-  // TODO
+  return sys_open(path, GENERIC_READ | GENERIC_WRITE, 0, nullptr, OPEN_ALWAYS,
+                  0, nullptr);
 #else
 #error Unknown platform
 #endif
@@ -209,7 +218,8 @@ handle handle::open_append(const boost::filesystem::path &path) {
 #if defined(BOOST_POSIX_API)
   return sys_open(path, O_WRONLY | O_APPEND | O_CREAT | O_CLOEXEC);
 #elif defined(BOOST_WINDOWS_API)
-  // TODO
+  return sys_open(path, FILE_APPEND_DATA, 0, nullptr, OPEN_ALWAYS, 0,
+                  nullptr);
 #else
 #error Unknown platform
 #endif
