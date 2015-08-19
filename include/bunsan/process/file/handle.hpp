@@ -7,12 +7,6 @@
 #include <boost/filesystem/path.hpp>
 #include <boost/optional.hpp>
 
-#if defined(BOOST_POSIX_API)
-#include <sys/types.h>
-#elif defined(BOOST_WINDOWS_API)
-#include <windows.h>
-#endif
-
 namespace bunsan {
 namespace process {
 namespace file {
@@ -22,7 +16,7 @@ class handle {
 #if defined(BOOST_POSIX_API)
   using implementation = int;
 #elif defined(BOOST_WINDOWS_API)
-  using implementation = HANDLE;
+  using implementation = void *;
 #endif
 
   handle() = default;

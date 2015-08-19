@@ -5,6 +5,10 @@
 
 #include <bunsan/filesystem/error.hpp>
 
+#if defined(BOOST_POSIX_API)
+#include <sys/types.h>
+#endif
+
 namespace bunsan {
 namespace process {
 namespace file {

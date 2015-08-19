@@ -8,7 +8,10 @@
 #if defined(BOOST_POSIX_API)
 #include <fcntl.h>
 #include <sys/stat.h>
+#include <sys/types.h>
 #include <unistd.h>
+#elif defined(BOOST_WINDOWS_API)
+#include <windows.h>
 #endif
 
 namespace bunsan {
