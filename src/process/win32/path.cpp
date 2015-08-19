@@ -18,8 +18,8 @@ boost::filesystem::path find_executable_in_path(
 
   const boost::filesystem::path exts[] = {"", ".exe", ".com", ".bat"};
   for (const auto &ext : exts) {
-    LPTSTR buf[MAX_PATH];
-    LPTSTR *dummy;
+    TCHAR buf[MAX_PATH];
+    LPTSTR dummy;
     const DWORD size = ::SearchPath(nullptr, executable.c_str(), ext.c_str(),
                                     MAX_PATH, buf, &dummy);
     BOOST_ASSERT(size < MAX_PATH);
