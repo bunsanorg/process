@@ -4,6 +4,7 @@
 #include <bunsan/system_error.hpp>
 
 #include <boost/assert.hpp>
+#include <boost/scope_exit.hpp>
 
 #if defined(BOOST_POSIX_API)
 #include <fcntl.h>
@@ -44,10 +45,22 @@ void handle::reset(const implementation fd) { handle(fd).swap(*this); }
 
 void handle::close() {
   if (m_fd) {
-    const int ret = ::close(*m_fd);
-    m_fd = boost::none;
-    if (ret) BOOST_THROW_EXCEPTION(bunsan::system_error("close"));
+    BOOST_SCOPE_EXIT_ALL(&) {
+      m_fd = boost::none;
+    };
+#if defined(BOOST_POSIX_API)
+    if (::close(*m_fd) == -1)
+      BOOST_THROW_EXCEPTION(system_error("close")
+                            << system_error::handle(*m_fd));
+#elif defined(BOOST_WINDOWS_API)
+    if (!::CloseHandle(*m_fd))
+      BOOST_THROW_EXCEPTION(system_error("CloseHandle")
+                            << system_error::handle(*m_fd));
+#else
+#error Unknown platform
+#endif
   }
+  BOOST_ASSERT(!m_fd);
 }
 
 void handle::close_no_except() noexcept {
