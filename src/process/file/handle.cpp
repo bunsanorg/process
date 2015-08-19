@@ -60,20 +60,19 @@ void handle::close_no_except() noexcept {
 
 handle handle::dup() const {
   if (!*this) BOOST_THROW_EXCEPTION(handle_is_closed_error());
-  BOOST_ASSERT(m_fd);
-  const implementation fd = ::dup(*m_fd);
+  const implementation fd = ::fcntl(**this, F_DUPFD_CLOEXEC, 0);
   if (fd < 0)
-    BOOST_THROW_EXCEPTION(system_error("dup") << system_error::handle(*m_fd));
+    BOOST_THROW_EXCEPTION(system_error("fcntl")
+                          << system_error::handle(**this));
   return handle(fd);
 }
 
 handle handle::dup2(const implementation new_fd) const {
   if (!*this) BOOST_THROW_EXCEPTION(handle_is_closed_error());
-  BOOST_ASSERT(m_fd);
-  const implementation fd = ::dup3(*m_fd, new_fd, O_CLOEXEC);
+  const implementation fd = ::dup3(**this, new_fd, O_CLOEXEC);
   if (fd < 0)
     BOOST_THROW_EXCEPTION(system_error("dup3")
-                          << system_error::handle(*m_fd)
+                          << system_error::handle(**this)
                           << system_error::new_handle(new_fd));
   return handle(fd);
 }
