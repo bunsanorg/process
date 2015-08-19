@@ -47,7 +47,10 @@ class handle {
   }
 
   handle dup() const;
+
+#if defined(BOOST_POSIX_API)
   handle dup2(implementation new_fd) const;
+#endif
 
   bool inheritable() const;
   void set_inheritable(bool inheritable=true);

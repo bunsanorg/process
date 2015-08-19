@@ -60,13 +60,24 @@ void handle::close_no_except() noexcept {
 
 handle handle::dup() const {
   if (!*this) BOOST_THROW_EXCEPTION(handle_is_closed_error());
+#if defined(BOOST_POSIX_API)
   const implementation fd = ::fcntl(**this, F_DUPFD_CLOEXEC, 0);
   if (fd < 0)
     BOOST_THROW_EXCEPTION(system_error("fcntl")
                           << system_error::handle(**this));
+#elif defined(BOOST_WINDOWS_API)
+  implementation fd;
+  if (!::DuplicateHandle(::GetCurrentProcess(), **this, ::GetCurrentProcess(),
+                         &fd, 0, /* not inheritable */ false,
+                         DUPLICATE_SAME_ACCESS)) {
+    BOOST_THROW_EXCEPTION(system_error("DuplicateHandle")
+                          << system_error::handle(**this));
+  }
+#endif
   return handle(fd);
 }
 
+#if defined(BOOST_POSIX_API)
 handle handle::dup2(const implementation new_fd) const {
   if (!*this) BOOST_THROW_EXCEPTION(handle_is_closed_error());
   const implementation fd = ::dup3(**this, new_fd, O_CLOEXEC);
@@ -76,6 +87,7 @@ handle handle::dup2(const implementation new_fd) const {
                           << system_error::new_handle(new_fd));
   return handle(fd);
 }
+#endif
 
 bool handle::inheritable() const {
 #if defined(BOOST_POSIX_API)
