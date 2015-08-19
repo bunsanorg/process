@@ -54,9 +54,15 @@ int sync_execute(context ctx) {
 
       boost::filesystem::current_path(ctx.current_path);
 
-      ctx.stdin_file = ctx.stdin_file.dup2(*file::handle::std_input());
-      ctx.stdout_file = ctx.stdout_file.dup2(*file::handle::std_output());
-      ctx.stderr_file = ctx.stderr_file.dup2(*file::handle::std_error());
+      if (*ctx.stdin_file != STDIN_FILENO)
+        ctx.stdin_file = ctx.stdin_file.dup2(*file::handle::std_input());
+      ctx.stdin_file.set_inheritable();
+      if (*ctx.stdout_file != STDOUT_FILENO)
+        ctx.stdout_file = ctx.stdout_file.dup2(*file::handle::std_output());
+      ctx.stdout_file.set_inheritable();
+      if (*ctx.stderr_file != STDERR_FILENO)
+        ctx.stderr_file = ctx.stderr_file.dup2(*file::handle::std_error());
+      ctx.stderr_file.set_inheritable();
 
       exec_.exec();
     } catch (std::exception &e) {

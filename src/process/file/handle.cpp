@@ -67,12 +67,48 @@ handle handle::dup() const {
 handle handle::dup2(const implementation new_fd) const {
   if (!*this) BOOST_THROW_EXCEPTION(handle_is_closed_error());
   BOOST_ASSERT(m_fd);
-  const implementation fd = ::dup2(*m_fd, new_fd);
+  const implementation fd = ::dup3(*m_fd, new_fd, O_CLOEXEC);
   if (fd < 0)
-    BOOST_THROW_EXCEPTION(system_error("dup2")
+    BOOST_THROW_EXCEPTION(system_error("dup3")
                           << system_error::handle(*m_fd)
                           << system_error::new_handle(new_fd));
   return handle(fd);
+}
+
+bool handle::inheritable() const {
+#if defined(BOOST_POSIX_API)
+  return ::fcntl(**this, F_GETFL) & FD_CLOEXEC;
+#elif defined(BOOST_WINDOWS_API)
+  DWORD flags;
+  if (!::GetHandleInformation(**this, &flags))
+    BOOST_THROW_EXCEPTION(system_error("GetHandleInformation")
+                          << system_error::handle(**this));
+  return flags & HANDLE_FLAG_INHERIT;
+#else
+#error Unknown platform
+#endif
+}
+
+void handle::set_inheritable(const bool inheritable) {
+#if defined(BOOST_POSIX_API)
+  int flags = ::fcntl(**this, F_GETFL);
+  if (inheritable) {
+    flags &= ~FD_CLOEXEC;
+  } else {
+    flags |= FD_CLOEXEC;
+  }
+  if (::fcntl(**this, F_SETFD, flags) == -1)
+    BOOST_THROW_EXCEPTION(system_error("fcntl")
+                          << system_error::handle(**this));
+#elif defined(BOOST_WINDOWS_API)
+  if (!::SetHandleInformation(**this, HANDLE_FLAG_INHERIT,
+                              i ? HANDLE_FLAG_INHERIT : 0)) {
+    BOOST_THROW_EXCEPTION(system_error("SetHandleInformation")
+                          << system_error::handle(**this));
+  }
+#else
+#error Unknown platform
+#endif
 }
 
 namespace {
@@ -114,7 +150,7 @@ handle handle::open_null() {
 
 handle handle::open_read(const boost::filesystem::path &path) {
 #if defined(BOOST_POSIX_API)
-  return sys_open(path, O_RDONLY);
+  return sys_open(path, O_RDONLY | O_CLOEXEC);
 #elif defined(BOOST_WINDOWS_API)
   // TODO
 #else
@@ -124,7 +160,7 @@ handle handle::open_read(const boost::filesystem::path &path) {
 
 handle handle::open_write(const boost::filesystem::path &path) {
 #if defined(BOOST_POSIX_API)
-  return sys_open(path, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+  return sys_open(path, O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC, 0666);
 #elif defined(BOOST_WINDOWS_API)
   // TODO
 #else
@@ -134,7 +170,7 @@ handle handle::open_write(const boost::filesystem::path &path) {
 
 handle handle::open_read_write(const boost::filesystem::path &path) {
 #if defined(BOOST_POSIX_API)
-  return sys_open(path, O_RDWR | O_CREAT, 0666);
+  return sys_open(path, O_RDWR | O_CREAT | O_CLOEXEC, 0666);
 #elif defined(BOOST_WINDOWS_API)
   // TODO
 #else
@@ -144,7 +180,7 @@ handle handle::open_read_write(const boost::filesystem::path &path) {
 
 handle handle::open_append(const boost::filesystem::path &path) {
 #if defined(BOOST_POSIX_API)
-  return sys_open(path, O_WRONLY | O_APPEND | O_CREAT);
+  return sys_open(path, O_WRONLY | O_APPEND | O_CREAT | O_CLOEXEC);
 #elif defined(BOOST_WINDOWS_API)
   // TODO
 #else

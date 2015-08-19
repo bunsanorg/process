@@ -55,6 +55,9 @@ class handle {
   handle dup() const;
   handle dup2(implementation new_fd) const;
 
+  bool inheritable() const;
+  void set_inheritable(bool inheritable=true);
+
   static handle open_null();  // /dev/null, NUL, ...
   static handle open_read(const boost::filesystem::path &path);
   static handle open_write(const boost::filesystem::path &path);
