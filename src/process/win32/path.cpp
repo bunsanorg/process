@@ -1,4 +1,4 @@
-#include <bunsan/process/detail/path.hpp>
+#include <bunsan/process/path.hpp>
 
 #include <bunsan/process/error.hpp>
 
@@ -8,7 +8,6 @@
 
 namespace bunsan {
 namespace process {
-namespace detail {
 
 boost::filesystem::path find_executable_in_path(
     const boost::filesystem::path &executable) {
@@ -31,6 +30,5 @@ boost::filesystem::path find_executable_in_path(
                         << no_executable_in_path_error::executable(executable));
 }
 
-}  // namespace detail
 }  // namespace process
 }  // namespace bunsan

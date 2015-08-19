@@ -13,14 +13,15 @@ endif()
 if(UNIX)
     set(platform_tests unix)
     set(platform_sources
-        src/process/detail/unix/path.cpp
+        src/process/unix/path.cpp
+
         src/process/detail/unix/execute.cpp
         src/process/detail/unix/executor.cpp
     )
 elseif(WIN32)
     set(platform_tests win32)
     set(platform_sources
-        src/process/detail/win32/path.cpp
+        src/process/win32/path.cpp
     )
 else()
     message(SEND_ERROR "Platform is not supported")
@@ -33,7 +34,6 @@ bunsan_add_library(${PROJECT_NAME}
     src/process/executor.cpp
     src/process/native_executor.cpp
     src/process/aliases.cpp
-    src/process/path.cpp
 
     src/process/file/handle.cpp
 
