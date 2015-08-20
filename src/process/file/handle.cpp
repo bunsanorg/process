@@ -163,7 +163,7 @@ handle sys_open(const boost::filesystem::path &path, const DWORD access,
                 const DWORD share_mode, SECURITY_ATTRIBUTES *const sec,
                 const DWORD creation, const DWORD flags,
                 const handle::implementation templ) {
-  const handle::implementation fd = ::CreateFile(
+  const handle::implementation fd = ::CreateFileW(
       path.c_str(), access, share_mode, sec, creation, flags, templ);
   if (fd == INVALID_HANDLE_VALUE)
     BOOST_THROW_EXCEPTION(system_error("CreateFile")
