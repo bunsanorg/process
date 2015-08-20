@@ -3,6 +3,7 @@
 #include <bunsan/process/context.hpp>
 
 #include <bunsan/error.hpp>
+#include <bunsan/filesystem/error.hpp>
 
 #include <boost/filesystem/path.hpp>
 
@@ -20,6 +21,10 @@ struct error : virtual bunsan::error {
       boost::error_info<struct tag_arguments, std::vector<std::string>>;
   using exit_status = boost::error_info<struct tag_exit_status, int>;
   using output = boost::error_info<struct tag_output, std::string>;
+};
+
+struct system_error : bunsan::filesystem::system_error, virtual error {
+  using bunsan::filesystem::system_error::system_error;
 };
 
 struct nothing_to_execute_error : virtual error {};

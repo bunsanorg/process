@@ -3,8 +3,6 @@
 #include <bunsan/process/error.hpp>
 #include <bunsan/process/file/handle.hpp>
 
-#include <bunsan/filesystem/error.hpp>
-
 #if defined(BOOST_POSIX_API)
 #include <sys/types.h>
 #endif
@@ -24,8 +22,8 @@ struct error : virtual process::error {
 #endif
 };
 
-struct system_error : bunsan::filesystem::system_error, virtual error {
-  using bunsan::filesystem::system_error::system_error;
+struct system_error : process::system_error, virtual error {
+  using process::system_error::system_error;
 };
 
 struct handle_error : virtual error {};

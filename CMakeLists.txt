@@ -22,6 +22,8 @@ elseif(WIN32)
     set(platform_tests win32)
     set(platform_sources
         src/process/win32/path.cpp
+
+        src/process/detail/win32/execute.cpp
     )
 else()
     message(SEND_ERROR "Platform is not supported")
