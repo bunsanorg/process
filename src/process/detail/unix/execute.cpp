@@ -4,6 +4,7 @@
 #include "executor.hpp"
 
 #include <bunsan/process/file/handle.hpp>
+#include <bunsan/process/signal.hpp>
 
 #include <boost/assert.hpp>
 #include <boost/filesystem/operations.hpp>
@@ -47,11 +48,7 @@ int sync_execute(context ctx) {
   } else {
     BOOST_ASSERT(pid == 0);
     try {
-      // clear parent's sigprocmask
-      sigset_t sset;
-      sigemptyset(&sset);
-      sigprocmask(SIG_SETMASK, &sset, nullptr);
-
+      reset_signals();
       boost::filesystem::current_path(ctx.current_path);
 
       if (*ctx.stdin_file != STDIN_FILENO)

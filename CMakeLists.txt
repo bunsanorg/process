@@ -14,6 +14,7 @@ if(UNIX)
     set(platform_tests unix)
     set(platform_sources
         src/process/unix/path.cpp
+        src/process/unix/signal.cpp
 
         src/process/detail/unix/execute.cpp
         src/process/detail/unix/executor.cpp
