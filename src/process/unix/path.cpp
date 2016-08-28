@@ -39,9 +39,14 @@ boost::filesystem::path find_executable_in_path(
                             boost::algorithm::token_compress_on);
 
     for (const boost::filesystem::path dir : path_dirs) {
-      const boost::filesystem::path abs_path =
-          boost::filesystem::absolute(dir / executable);
-      if (boost::filesystem::exists(abs_path)) return abs_path;
+      try {
+        const boost::filesystem::path abs_path =
+            boost::filesystem::absolute(dir / executable);
+        if (boost::filesystem::exists(abs_path)) return abs_path;
+      } catch (boost::filesystem::filesystem_error &) {
+        // skip unaccessible path
+        continue;
+      }
     }
 
     BOOST_THROW_EXCEPTION(
